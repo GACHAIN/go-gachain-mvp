@@ -1,0 +1,13 @@
+[Unit]
+Description=PostgreSQL server
+After=network.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/opt/postgresql/ctlscript.sh start
+ExecStop=/opt/postgresql/ctlscript.sh stop
+WorkingDirectory=/opt/postgresql
+
+[Install]
+WantedBy=multi-user.target

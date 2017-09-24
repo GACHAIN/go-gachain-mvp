@@ -1,0 +1,17 @@
+language: go
+
+go:
+  - 1.6.x
+  - 1.7.x
+  - 1.8.x
+  - 1.9.x
+  - master
+
+go_import_path: github.com/GACHAIN/go-gachain-mvp
+
+install: make go-bindata
+
+before_script: make static-files
+
+script: make build
+

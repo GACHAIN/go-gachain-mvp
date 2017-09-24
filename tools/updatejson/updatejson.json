@@ -1,0 +1,17 @@
+{
+	"default" : {
+		"Version" : "1.1",
+		"Domain" : "https://gachain.org/",
+		"InPath": "c:\\gachain",
+		"OutPath": "c:\\temp",
+		"JsonPath": "c:\\gachain"
+	},
+	"windows_amd64" : {
+		"File": "gachain.exe",
+		"ZipFile": "gachain64.zip"
+	},
+	"windows_386" : {
+		"File": "gachain.exe",
+		"ZipFile": "gachain32.zip"
+	}
+}
