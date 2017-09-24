@@ -1,7 +1,7 @@
 #!/bin/bash
 
 VCS_URL="https://support%40gachain.org@github.com/GACHAIN/go-gachain-mvp.git"
-VCS_BRANCH="develop-gachain"
+VCS_BRANCH="develop"
 GOPATH="/root/gocode"
 BIN="$GOPATH/bin/go-gachain-mvp"
 ROOT="/root/gocode/src/github.com/GACHAIN/go-gachain-mvp"
