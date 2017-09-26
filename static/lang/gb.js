@@ -6,6 +6,10 @@ Lang = {
 	"install_success_title": "Success",
 	"install_success": "The application has been successfully installed",
 	"wait_manual": "Please wait, the application passes the manual processing",
+	"generated_keys": "Generated keys",
+	"generate_keys": "Generate keys",
+	"can_not_apply": "Can not apply",
+	"can_do": "Can do",
 /** ================================================= */
 	"installation": "Installation",
 	"mode": "Mode",

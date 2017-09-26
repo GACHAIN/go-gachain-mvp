@@ -6,6 +6,10 @@ Lang = {
 	"install_success_title": "安装完成！",
 	"install_success": "该应用程序已成功安装",
 	"wait_manual": "请稍等，该应用请求正在人工处理中",
+	"generated_keys": "已生成密钥",
+	"generate_keys": "生成密钥",
+	"can_not_apply": "深圳智乾区块链科技有限公司",
+	"can_do": "深圳智乾区块链科技",
 /** ================================================= */
 	"installation": "安装",
 	"mode": "模式",
