@@ -156,8 +156,15 @@ function dl_navigate0(page, parameters) {
 
 	clearAllTimeouts();
 	NProgress.set(1.0);
-	$.post("content?page=" + page, { tpl_name: page, parameters: json },
-		function (data) {
+	$.ajax({
+		url : 'content?page=' + page,
+		type: 'POST',
+		dataType : 'html',
+		data: { tpl_name: page, parameters: json },
+		beforeSend: function(xhr) {
+			xhr.setRequestHeader("Accept-Language", currentLang);
+		},
+		success: function (data) {
 			$(".sweet-overlay, .sweet-alert").remove();
 			$('#dl_content').html(data);
 			updateLanguage("#dl_content .lang");
@@ -170,8 +177,8 @@ function dl_navigate0(page, parameters) {
 					load_menu();
 			}
 			window.scrollTo(0, 0);
-		}, "html");
-
+		}
+	});
 }
 
 var MenuAPI;
@@ -448,6 +455,9 @@ function ajaxMenu(page, parameters, customFunc) {
 	$.ajax({
 		url: 'ajax?controllerName=ajaxGetMenuHtml&page=' + page,
 		type: 'POST',
+		beforeSend: function(xhr) {
+			xhr.setRequestHeader("Accept-Language", currentLang);
+		},
 		data: parameters ? parameters : {},
 		success: function (data) {
 			if (data.length == 0) {
@@ -552,8 +562,15 @@ function load_template(page, parameters, anchor, customFunc) {
 		"template?page=" + page);
 	clearAllTimeouts();
 	NProgress.set(1.0);
-	$.post(url, parameters ? parameters : {},
-		function (data) {
+	$.ajax({
+		url : url,
+		type: 'POST',
+		dataType : 'html',
+		data: parameters ? parameters : {},
+		beforeSend: function(xhr) {
+			xhr.setRequestHeader("Accept-Language", currentLang);
+		},
+		success: function (data) {
 			if (data == '') {
 				load_page('newPage', { global: 0, name: page });
 				return;
@@ -569,7 +586,8 @@ function load_template(page, parameters, anchor, customFunc) {
 			}
 			if (!isPage && !isApp)
 				ajaxMenu(page, parameters, customFunc);
-		}, "html");
+		}
+	});
 }
 
 function load_file(input) {
@@ -890,10 +908,20 @@ function load_menu(lang, submenu) {
 		if (typeof lang != 'undefined') {
 			parametersJson: '{"lang":"1"}'
 		}
-		$("#dl_menu").load("content?page=menu", { parameters: parametersJson }, function () {
-			updateLanguage("#dl_menu .lang");
-			if (typeof submenu === "string")
-				ajaxMenu(submenu);
+		$.ajax({
+			url : 'content?page=menu',
+			type: 'POST',
+			dataType : 'html',
+			data: { parameters: parametersJson },
+			beforeSend: function(xhr) {
+				xhr.setRequestHeader("Accept-Language", currentLang);
+			},
+			success: function (data) {
+				$("#dl_menu").html(data);
+				updateLanguage("#dl_menu .lang");
+				if (typeof submenu === "string")
+					ajaxMenu(submenu);
+			}
 		});
 	} else {
 		$("#dl_menu").html('');
@@ -1666,8 +1694,15 @@ function InitMobileTable() {
 function autoUpdate(id, period) {
 	var body = $("#auto" + id + "body").html();
 	if (body && GKey.StateId) {
-		$.post('template?page=body', { body: body },
-			function (data) {
+		$.ajax({
+			url : 'template?page=body',
+			type: 'POST',
+			dataType : 'html',
+			data: { body: body },
+			beforeSend: function(xhr) {
+				xhr.setRequestHeader("Accept-Language", currentLang);
+			},
+			success: function (data) {
 				if (data == '') {
 					return;
 				}
@@ -1675,7 +1710,8 @@ function autoUpdate(id, period) {
 					$('#auto' + id).html(data);
 					setTimeout(function () { autoUpdate(id, period); }, period * 1000);
 				}
-			}, "html");
+			}
+		});
 	}
 }
 
