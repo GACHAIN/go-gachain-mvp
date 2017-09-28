@@ -10,6 +10,7 @@ Lang = {
 	"generate_keys": "Generate keys",
 	"can_not_apply": "Can not apply",
 	"can_do": "Can do",
+	"system": "System",
 /** ================================================= */
 	"installation": "Installation",
 	"mode": "Mode",

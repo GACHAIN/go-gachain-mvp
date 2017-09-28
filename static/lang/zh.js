@@ -10,6 +10,7 @@ Lang = {
 	"generate_keys": "生成密钥",
 	"can_not_apply": "深圳智乾区块链科技有限公司",
 	"can_do": "深圳智乾区块链科技",
+	"system": "系统",
 /** ================================================= */
 	"installation": "安装",
 	"mode": "模式",
@@ -59,7 +60,7 @@ Lang = {
 	"success": "成功",
 	"info": "信息",
 	"imprinted_blockchain": "在区块链中盖戳，区块 ",
-	"egs_wallet": "GAC-wallet",
+	"egs_wallet": "GAC-钱包",
 	"dashboard": "仪表板",
 	"available_balance": "可用余额",
 	"your_wallet": "您的钱包",
