@@ -124,7 +124,7 @@ func (c *Controller) Menu() (string, error) {
 	var langs []LangInfo
 	if len(utils.LangList) > 0 {
 		for _, val := range utils.LangList {
-			if val == `en` {
+			if val == `gb` {
 				langs = append(langs, LangInfo{Title: `English (UK)`, Code: `gb`})
 			}
 			if val == `zh` {
