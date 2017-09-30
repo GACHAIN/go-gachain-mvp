@@ -70,10 +70,11 @@ function js_newpars() {
 
 </script>
 	<div class="content-heading">
-		{{if .Name}}Edit{{else}}New{{end}} Signature
+		{{if .Name}}<span class="lang" lang-id="edit"></span>{{else}}<span class="lang" lang-id="new"></span>{{end}} <span class="lang" lang-id="signature"></span>
 	</div>
 	<ol class="breadcrumb">
-	   <li><a href="#" onclick="load_page('signatures')">Signatures</a></li> {{if eq .Global "1"}}<li><a href="#" onclick="load_page('signatures', {global: 1})">Global</a></li>{{end}}
+		<li><a href="#" onclick="load_page('signatures')" class="lang" lang-id="signatures"></a>
+		</li> {{if eq .Global "1"}}<li><a href="#" onclick="load_page('signatures', {global: 1})" class="lang" lang-id="global"></a></li>{{end}}
 	</ol>
 	
 	<div class="form">
