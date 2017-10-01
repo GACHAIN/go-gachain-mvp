@@ -9,7 +9,7 @@
 	$('#send').bind('click', function () {
 		name = $("#name").val();
 		if (name== '') {
-			alert('Specify Name of the language resource');
+			alert(returnLang('specify_name_lang_res'));
 			return false;
 		}
 		var trans = {};
@@ -26,7 +26,7 @@
 			}
 		});
 		if (transcount== 0) {
-			alert('There are not translations');
+			alert(returnLang('there_are_not_translations'));
 			return false;
 		}
 		transdata = JSON.stringify(trans);
@@ -71,10 +71,10 @@ function js_newtrans() {
 
 </script>
 <div class="content-heading">
-	{{if .Name}}Edit{{else}}New{{end}} Language Resource
+	{{if .Name}}<span class="lang" lang-id="edit"></span>{{else}}<span class="lang" lang-id="new"></span>{{end}} <span class="lang" lang-id="language_resource"></span>
 </div>
 <ol class="breadcrumb">
-	<li><a href="#" onclick="load_page('languages')">Languages resources</a></li>
+	<li><a href="#" onclick="load_page('languages')" class="lang" lang-id="languages_resources"></a></li>
 </ol>
 <!-- START panel-->
 <div class="panel panel-default" data-sweet-alert>
@@ -86,15 +86,15 @@ function js_newtrans() {
 	<div class="panel-body">
 		<form role="form">
 			<div class="form-group">
-				<label>Name</label>
+				<label class="lang" lang-id="name"></label>
 				<input type="text" class="form-control" id="name" value="{{.Name}}">
 			</div>
 			<div class="form-group">
 				<div class="col-md-1 col-xs-1" style="padding: 5px 5px;">
-					<label>Language</label>
+					<label class="lang" lang-id="language"></label>
 				</div>
 				<div class="col-md-11 col-xs-1" style="padding: 5px 5px;">
-					<label>Text</label>
+					<label class="lang" lang-id="text"></label>
 				</div>
 			</div>
 			<div class="form-group" id="lang-list">
@@ -115,14 +115,14 @@ function js_newtrans() {
 				{{end}}
 			</div>
 			<div class="pull-left">
-				<a href="#" onclick="return js_newtrans();">New translation</a>
+				<a href="#" onclick="return js_newtrans();" class="lang" lang-id="new_translation"></a>
 			</div>
 		</form>
 	</div>
 	<div class="panel-footer">
 		<div class="clearfix">
 			<div class="pull-left">
-				<button type="button" class="btn btn-primary" id="send" data-tool="panel-refresh" onClick="preloader(this);">Send</button>
+				<button type="button" class="btn btn-primary lang" lang-id="send" id="send" data-tool="panel-refresh" onClick="preloader(this);"></button>
 			</div>
 		</div>
 	</div>

@@ -96,7 +96,7 @@ function js_appendpage(pref) {
 	var name = $("#sel" + pref).val();
 	var val = $("#" + pref + "value").val();
 	if (val == '') {
-		alert('Specify text');
+		alert(returnLang('specify_text'));
 		return;
 	}
 	idappend++;

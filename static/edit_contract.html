@@ -209,7 +209,7 @@
 				   </div>
 				   <div class="pull-xs-right" style="min-width:220px;">
 					   <div class="form-group">
-						   <label>Wallet ID: </label>
+						   <label><span class="lang" lang-id="wallet_id"></span>: </label>
 						   {{if .Data.name}}
 						   	{{.Data.wallet}}
 						   {{else}}
@@ -217,7 +217,7 @@
 						   {{end}}
 					   </div>
 					   <div class="form-group mb-lg">
-						   <label>Active: </label>
+						   <label><span class="lang" lang-id="active"></span>: </label>
 						   {{.Data.active}}&nbsp;&nbsp;&nbsp;
 						   {{if .Confirm}}
 							   {{if ne .Data.active "1"}}<button type="button" id="activate" class="btn btn-primary lang" data-tool="panel-refresh" onClick="activate_contract(this);" >Activate</button>{{end}}
