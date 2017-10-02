@@ -2496,10 +2496,10 @@ DivsEnd:
 
 PageEnd:`,
 `pc_AddLand #= ContractConditions("MainCondition")`,
-`p_AddProperty #= Title: Add property
+`p_AddProperty #= Title: LangJS(add_property)
 UList(breadcrumb, ol)
-    LiTemplate(Property,Property)
-    Li(Add)
+    LiTemplate(Property, LangJS(property))
+    Li(LangJS(add))
 UListEnd:
 SetVar(``coord = {"center_point":["41.840465","-37.234806"], "zoom":"3"}``)
 
@@ -2511,21 +2511,21 @@ Divs(md-6, panel panel-default data-sweet-alert)
                InputMapPoly(coords,#coord#,coords_address,area)
             DivsEnd:
             Divs(form-group)
-               Label($area$)
+               Label(LangJS(area))
                Input(area,form-control input-sm,"",text)
             DivsEnd:
             Divs(form-group)
-               Label($address$)
+               Label(LangJS(address))
                Input(coords_address,form-control input-sm,"",text)
             DivsEnd:
 
             Divs(form-group)
-                Label("Property types")
+                Label(LangJS(property_types))
                 Select(property_types,buildings_use_class,form-control input-lg)
             DivsEnd:
 
             Divs(form-group)
-                Label("Owner")
+                Label(LangJS(owner))
                 InputAddress(owner_id, "form-control input-lg m-b")
             DivsEnd:
         FormEnd:
@@ -2533,7 +2533,7 @@ Divs(md-6, panel panel-default data-sweet-alert)
     Divs(panel-footer)
         Divs: clearfix
             Divs: pull-right
-                TxButton{ClassBtn:btn btn-primary btn-pill-right, Contract: AddProperty,Name: Add, OnSuccess: "template,Property"}
+                TxButton{ClassBtn:btn btn-primary btn-pill-right, Contract: AddProperty,Name: $add$, OnSuccess: "template,Property"}
             DivsEnd:
         DivsEnd:
     DivsEnd:
@@ -3847,9 +3847,9 @@ DivsEnd:
 
 PageEnd:`,
 `pc_notification_view_single #= ContractConditions("MainCondition")`,
-`p_Property #= Title : Property
+`p_Property #= Title : LangJS(property)
 UList(breadcrumb, ol)
-    Li(Property)
+    Li(LangJS(property))
 UListEnd:
 
 Divs(md-12)
@@ -3924,7 +3924,7 @@ IfEnd:
 GetList(ava, #state_id#_citizens, "id,avatar,name", "id!=0")
 Divs(md-12, panel panel-default panel-body)
     Divs(table-responsive)
-        MarkDown : ## Property
+        MarkDown : ## LangJS(property)
         Table {
             Class: table-striped table-bordered table-hover data-role="table"
             Table:  #state_id#_property
@@ -3936,7 +3936,7 @@ Divs(md-12, panel panel-default panel-body)
             [Leaser, If(#leaser# != 0, LinkPage(CitizenInfo, Div("text-center",GetRow("leaser", #state_id#_citizens, "id", GetVar(leaser)) Div("",Image(If(GetVar(leaser_avatar)!=="",#leaser_avatar#,"/static/img/avatar.svg"), Avatar, img-thumbnail img-circle thumb-full w-40 h-40)Div("text-center", #leaser_name#))),"citizenId:'#leaser_id#',gstate_id:#state_id#",pointer),"") ],
             [Edit,BtnPage(EditProperty,Edit,"PropertyId:#id#")]]
         }
-        BtnPage(AddProperty, AddProperty, '',btn btn-primary) BR()
+        BtnPage(AddProperty, LangJS(add_property), '',btn btn-primary) BR()
     DivsEnd:
 DivsEnd:`,
 `pc_property_list #= ContractConditions("MainCondition")`,

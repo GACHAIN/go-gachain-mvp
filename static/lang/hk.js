@@ -59,6 +59,11 @@ Lang = {
 	"icon": "圖標",
 	"header": "擡頭",
 	"direction_page": "目標頁面",
+	"add_property": "新增房產",
+	"property_types": "房產類型",
+	"area": "面積",
+	"owner": "業主",
+	"add": "增加",
 /** ================================================= */
 	"installation": "安裝",
 	"mode": "模式",

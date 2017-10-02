@@ -59,6 +59,11 @@ Lang = {
 	"icon": "Icon",
 	"header": "Header",
 	"direction_page": "Direction page",
+	"add_property": "Add property",
+	"property_types": "Property types",
+	"area": "Area",
+	"owner": "Owner",
+	"add": "Add",
 /** ================================================= */
 	"installation": "Installation",
 	"mode": "Mode",

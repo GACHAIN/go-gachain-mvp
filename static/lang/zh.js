@@ -59,6 +59,11 @@ Lang = {
 	"icon": "图标",
 	"header": "抬头",
 	"direction_page": "目标页面",
+	"add_property": "新增房产",
+	"property_types": "房产类型",
+	"area": "面积",
+	"owner": "业主",
+	"add": "增加",
 /** ================================================= */
 	"installation": "安装",
 	"mode": "模式",
