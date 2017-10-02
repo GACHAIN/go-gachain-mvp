@@ -2685,9 +2685,9 @@ DivsEnd:
 
 IfEnd:`,
 `pc_chat_IncomingRoleMessages #= ContractConditions("MainCondition")`,
-`p_CitizenInfo #= Title: User info
+`p_CitizenInfo #= Title: LangJS(user_info)
 UList(breadcrumb, ol)
-    Li(User info)
+    Li(LangJS(user_info))
 UListEnd:
 
 If(GetVar(citizenId))
@@ -2700,7 +2700,7 @@ IfEnd:
 GetRow("user", #gstate_id#_citizens, "id", #citizenId#)
 
 Divs(md-6, panel panel-default elastic data-sweet-alert)
-    Div(panel-heading, Div(panel-title, Div(text-bold, User information) ))
+    Div(panel-heading, Div(panel-title, Div(text-bold, LangJS(user_info)) ))
     Divs: panel-body text-center
         Divs:
             Image(If(GetVar(user_avatar)!=="", #user_avatar#, "/static/img/avatar.svg"), Image, img-thumbnail img-circle w-100 h-100)
@@ -2717,26 +2717,26 @@ Divs(md-6, panel panel-default elastic data-sweet-alert)
         Divs: row
             Divs: col-md-12 mt-sm
                 Tag(h4, Address(#user_id#) Em(clipboard fa fa-clipboard id="clipboard" aria-hidden="true" data-clipboard-action="copy" data-clipboard-text=Address(#user_id#) onClick="CopyToClipboard('#clipboard')", ), m0)
-                P(text-muted m0, Citizen ID)
+                P(text-muted m0, LangJS(citizen_id))
             DivsEnd:
         DivsEnd:
     DivsEnd:
 DivsEnd:
 
 Divs(md-6, panel panel-default elastic data-sweet-alert)
-    Div(panel-heading, Div(panel-title, Div(text-bold,  Money transfer)) )
+    Div(panel-heading, Div(panel-title, Div(text-bold,  LangJS(money_transfer))) )
     Divs(panel-body)
         Form()
             Divs(form-group)
-                Label(My tokens)
+                Label(LangJS(my_tokens))
                 Input(MyTokens, "form-control  m-b disabled=''",text,text,Money(GetOne(amount, #state_id#_accounts#, "citizen_id='#citizen#' and onhold=0 and type=3")))
             DivsEnd:
             Divs(form-group)
-                Label(Recipient account ID)
+                Label(LangJS(recipient_account_id))
                 Select(RecipientAccountID, #state_id#_accounts.id, "form-control m-b",#vRecipientAccID#)
             DivsEnd:
             Divs(form-group)
-                Label(Amount)
+                Label(LangJS(amount))
                 Input(Amount, "form-control  m-b ",text,text,12.50)
             DivsEnd:
         FormEnd:
@@ -2753,7 +2753,7 @@ Divs(md-6, panel panel-default elastic data-sweet-alert)
 DivsEnd:
 
 Divs(md-12, panel panel-default elastic data-sweet-alert)
-    Div(panel-heading, Div(panel-title, Div(text-bold,  Pending notifications)) )
+    Div(panel-heading, Div(panel-title, Div(text-bold,  LangJS(pending_notifications))) )
     Divs(panel-body)
         Divs(table-responsive)
         Table{
@@ -4194,7 +4194,7 @@ Divs:content-wrapper
                 Divs(panel-body)
                     Form()
                         Divs(form-group)
-                            Label(Citizen ID)
+                            Label(LangJS(citizen_id))
                             InputAddress(CitizenID, "form-control input-lg m-b")
                         DivsEnd:
                         Divs(form-group)
@@ -4538,8 +4538,8 @@ DivsEnd:
 
 PageEnd:`,
 `pc_tokens_money_rollback #= ContractConditions("MainCondition")`,
-`p_tokens_money_transfer #= Title:Money transfer
-Navigation(Money transfer) 
+`p_tokens_money_transfer #= Title:LangJS(money_transfer)
+Navigation(LangJS(money_transfer)) 
 
 Divs:content-wrapper 
     Divs: row df f-valign
@@ -4547,7 +4547,7 @@ Divs:content-wrapper
         DivsEnd:
 		Divs: col-md-6 mt-sm text-left
             Divs(md-6, panel panel-primary data-sweet-alert)
-                Div(panel-heading, Div(panel-title, Money transfer))
+                Div(panel-heading, Div(panel-title, LangJS(money_transfer)))
                 Divs(panel-body)
                     Form()
                         Divs(form-group)
@@ -4603,7 +4603,7 @@ Divs:content-wrapper
                             IfEnd:
                         DivsEnd:
                         Divs(form-group)
-                            Label(Recipient account ID)
+                            Label(LangJS(recipient_account_id))
                             Divs(input-group)
                                 Select(RecipientAccountID, #state_id#_accounts.id, "form-control m-b",#vRecipientAccID#)
                                 Divs(input-group-btn)
@@ -4675,7 +4675,7 @@ DivsEnd:
 PageEnd:`,
 `pc_tokens_money_transfer #= ContractConditions("MainCondition")`,
 `p_tokens_money_transfer_agency #= Title:Money transfer (for agency)
-Navigation(Money transfer)
+Navigation(LangJS(money_transfer))
 
 SetVar(person_acc=3)
 SetVar(agency_acc=4)  
@@ -4687,11 +4687,11 @@ Divs:content-wrapper
         DivsEnd:
 		Divs: col-md-6 mt-sm text-left
             Divs(md-6, panel panel-primary data-sweet-alert)
-                Div(panel-heading, Div(panel-title, Money transfer))
+                Div(panel-heading, Div(panel-title, LangJS(money_transfer)))
                 Divs(panel-body)
                     Form()
                         Divs(form-group)
-                            Label(Recipient account ID)
+                            Label(LangJS(recipient_account_id))
                             Divs(input-group)
                                 Select(RecipientAccountID, #state_id#_accounts.id, "form-control m-b",#vRecipientAccID#)
                                 Divs(input-group-btn)
@@ -4766,7 +4766,7 @@ DivsEnd:
 PageEnd:`,
 `pc_tokens_money_transfer_agency #= ContractConditions("MainCondition")`,
 `p_tokens_money_transfer_company #= Title:Money transfer (for company)
-Navigation(Money transfer)
+Navigation(LangJS(money_transfer))
 
 SetVar(person_acc=3)
 SetVar(agency_acc=4)  
@@ -4778,11 +4778,11 @@ Divs:content-wrapper
         DivsEnd:
 		Divs: col-md-6 mt-sm text-left
             Divs(md-6, panel panel-primary data-sweet-alert)
-                Div(panel-heading, Div(panel-title, Money transfer))
+                Div(panel-heading, Div(panel-title, LangJS(money_transfer)))
                 Divs(panel-body)
                     Form()
                         Divs(form-group)
-                            Label(Recipient account ID)
+                            Label(LangJS(recipient_account_id))
                             Divs(input-group)
                                 Select(RecipientAccountID, #state_id#_accounts.id, "form-control m-b",#vRecipientAccID#)
                                 Divs(input-group-btn)
@@ -4856,8 +4856,8 @@ DivsEnd:
 
 PageEnd:`,
 `pc_tokens_money_transfer_company #= ContractConditions("MainCondition")`,
-`p_tokens_money_transfer_person #= Title:Money transfer
-Navigation(Money transfer)
+`p_tokens_money_transfer_person #= Title:LangJS(money_transfer)
+Navigation(LangJS(money_transfer))
 
 SetVar(person_acc=3)
 SetVar(agency_acc=4)  
@@ -4869,11 +4869,11 @@ Divs:content-wrapper
         DivsEnd:
 		Divs: col-md-6 mt-sm text-left
             Divs(md-6, panel panel-primary data-sweet-alert)
-                Div(panel-heading, Div(panel-title, Money transfer))
+                Div(panel-heading, Div(panel-title, LangJS(money_transfer)))
                 Divs(panel-body)
                     Form()
                         Divs(form-group)
-                            Label(Recipient account ID)
+                            Label(LangJS(recipient_account_id))
                             Divs(input-group)
                                 Select(RecipientAccountID, #state_id#_accounts.id, "form-control m-b",#vRecipientAccID#)
                                 Divs(input-group-btn)
