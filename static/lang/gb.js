@@ -64,6 +64,11 @@ Lang = {
 	"area": "Area",
 	"owner": "Owner",
 	"add": "Add",
+	"my_chats": "My Chats",
+	"my_private_chats": "My private chats",
+	"my_chats_with_other_roles": "My chats with other roles",
+	"role_name": "Role Name",
+	"show_role_messages": "Show role messages",
 /** ================================================= */
 	"installation": "Installation",
 	"mode": "Mode",

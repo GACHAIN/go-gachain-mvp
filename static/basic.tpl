@@ -2543,7 +2543,7 @@ PageEnd:`,
 `pc_AddProperty #= ContractConditions("MainCondition")`,
 `p_Chat_history #= Title: Chat history
 
-Navigation(LiTemplate(MyChats, My Chats), Chat history)
+Navigation(LiTemplate(MyChats, LangJS(my_chats)), Chat history)
 
 If(#vPageValue#==-1)
     SetVar(showAllUnreplied=1)
@@ -2647,7 +2647,7 @@ PageEnd:`,
 `pc_Chat_history #= ContractConditions("MainCondition")`,
 `p_chat_IncomingRoleMessages #= Title: Role messages
 
-Navigation(LiTemplate(MyChats, My Chats), Role messages)
+Navigation(LiTemplate(MyChats, LangJS(my_chats)), Role messages)
 
 AutoUpdate(2)
 Include(notification)
@@ -3388,15 +3388,15 @@ DivsEnd:
 
 PageEnd:`,
 `pc_members_request_edit #= ContractConditions("MainCondition")`,
-`p_MyChats #= Title: My Chats
-Navigation(My Chats)
+`p_MyChats #= Title: LangJS(my_chats)
+Navigation(LangJS(my_chats))
 
 AutoUpdate(2)
 Include(notification)
 AutoUpdateEnd:
 
 Divs(md-12, panel panel-default elastic data-sweet-alert)
-    Div(panel-heading, Div(panel-title, My private chats))
+    Div(panel-heading, Div(panel-title, LangJS(my_private_chats)))
         Divs(panel-body)
             Divs(table-responsive)
                 Table{
@@ -3406,11 +3406,11 @@ Divs(md-12, panel panel-default elastic data-sweet-alert)
                     Where: (#citizen# = #higher_id#) or (#citizen# = #lower_id#)
                     Columns:  [
                         [
-                            Name,
+                            $name$,
                             If(#citizen# == #receiver_id#, Image(If(#sender_avatar#!=="",#sender_avatar#,"/static/img/avatar.svg"), Avatar, img-circle thumb32) LinkPage(CitizenInfo,#sender_name#,"citizenId:'#sender_id#',gstate_id:#state_id#",pointer), Image(If(#receiver_avatar#!=="",#receiver_avatar#,"/static/img/avatar.svg"), Avatar, img-circle thumb32) LinkPage(CitizenInfo,#receiver_name#,"citizenId:'#receiver_id#',gstate_id:#state_id#",pointer))
                         ],
                         [
-                            Message,
+                            $message$,
                             Image(If(#sender_avatar#!=="",#sender_avatar#,"/static/img/avatar.svg"), Avatar, img-circle thumb32) #last_message#
                         ]
                     ]
@@ -3421,7 +3421,7 @@ Divs(md-12, panel panel-default elastic data-sweet-alert)
 DivsEnd:
 
 Divs(md-6, panel panel-default elastic data-sweet-alert)
-    Div(panel-heading, Div(panel-title, My chats with other roles))
+    Div(panel-heading, Div(panel-title, LangJS(my_chats_with_other_roles)))
     Divs: panel-body
         GetList(messages, #state_id#_chat_role_chats, "id,citizen_id,role_id,sender_avatar,sender_name,last_message,last_message_frome_role","citizen_id = #citizen#", "id")
         ForList(messages)
@@ -3450,7 +3450,7 @@ Divs(md-6, panel panel-default elastic data-sweet-alert)
     Divs: panel-body
         Form()
             Divs(form-group)
-                Label(Role name)
+                Label(LangJS(role_name))
                 Select(RoleID, #state_id#_roles_list.role_name, "form-control m-b", 0)
                 Input(RecipientID, "form-control  m-b hidden disabled=''",integer,text,"" )
             DivsEnd:
@@ -3462,7 +3462,7 @@ Divs(md-6, panel panel-default elastic data-sweet-alert)
                 DivsEnd:
             DivsEnd:
             P(h6, <br>)
-            BtnPage(chat_IncomingRoleMessages, Show role messages, "roleId:Val(RoleID)", btn btn-default ml4)
+            BtnPage(chat_IncomingRoleMessages, LangJS(show_role_messages), "roleId:Val(RoleID)", btn btn-default ml4)
         FormEnd:
     DivsEnd:
 DivsEnd:
@@ -3535,7 +3535,7 @@ Divs:content-wrapper
                 Divs(panel-body)
                     Form()
                         Divs(form-group)
-                            Label(Role name)
+                            Label(LangJS(role_name))
                             Select(RoleID, #state_id#_roles_list.role_name, "form-control m-b", #vRoleID#)
                             Input(RecipientID, "form-control  m-b hidden disabled=''",integer,text,"" )
                         DivsEnd:
@@ -3992,7 +3992,7 @@ Divs:content-wrapper
                             IfEnd:
                         DivsEnd:
                         Divs(form-group)
-                            Label(Role name)
+                            Label(LangJS(role_name))
                             Select(RoleID, #state_id#_roles_list.role_name, "form-control m-b", #vRoleID#)
                         DivsEnd:
                     FormEnd:
@@ -5047,7 +5047,7 @@ If(GetVar(vID))
                 Form()
                     Divs(list-group-item)
                         Divs(form-group)
-                            Label(Role name)
+                            Label(LangJS(role_name))
                             P(form-text text-muted, Select a role for voting)
                             Divs(input-group)
                                 Select(roleID, #state_id#_roles_list.role_name, "form-control m-b", #roleID#)
@@ -5204,7 +5204,7 @@ If(GetVar(vID))
                 Form()
                     Divs(list-group-item)
                         Divs(form-group)
-                            Label(Role name)
+                            Label(LangJS(role_name))
                             P(form-text text-muted, Select a role for voting)
                             Divs(input-group)
                                 Select(roleID, #state_id#_roles_list.role_name, "form-control m-b", #roleID#)
@@ -5633,7 +5633,7 @@ If(GetVar(vID))
                         If(Or(#typeDecision#==1,#typeDecision#==2))
                             Divs: row df f-valign
                         		Divs: col-md-6 mt-sm text-right
-                     		        Div(h4 text-normal, "Role name:")
+                     		        Div(h4 text-normal, LangJS(role_name))
                                 DivsEnd:
                         		Divs: col-md-6 mt-sm text-left
                      		        Div(h4 text-normal, If(#roleID#>0, GetOne(role_name, #state_id#_roles_list#, "id=#roleID#"), "[no]") )

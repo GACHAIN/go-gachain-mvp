@@ -64,6 +64,11 @@ Lang = {
 	"area": "面积",
 	"owner": "业主",
 	"add": "增加",
+	"my_chats": "我的交流窗口",
+	"my_private_chats": "我的私密交流",
+	"my_chats_with_other_roles": "与其他职务成员的交流",
+	"role_name": "职务名称",
+	"show_role_messages": "显示职务类信息",
 /** ================================================= */
 	"installation": "安装",
 	"mode": "模式",
