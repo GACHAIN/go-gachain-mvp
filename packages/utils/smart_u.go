@@ -1468,7 +1468,7 @@ func InputMapPoly(vars *map[string]string, pars ...string) string {
 		idsquare = lib.Escape(pars[3])
 	}
 	out := fmt.Sprintf(`<div class="form-group"><label>Map</label><textarea class="form-control" id="%s">%s</textarea>
-	<button type="button" onClick="openMap('%[1]s', '%[3]s', '%s');" class="btn btn-primary"><i class="fa fa-map-marker"></i> &nbsp;Add/Edit Coords</button></div>`,
+	<button type="button" onClick="openMap('%[1]s', '%[3]s', '%s');" class="btn btn-primary"><i class="fa fa-map-marker"></i> &nbsp;<span class="lang" lang-id="add_edit_coords"></span></button></div>`,
 		id, coords, idaddress, idsquare)
 	return out
 }

@@ -69,6 +69,7 @@ Lang = {
 	"my_chats_with_other_roles": "與其他職務成員的交流",
 	"role_name": "職務名稱",
 	"show_role_messages": "顯示職務類信息",
+	"go": "走",
 /** ================================================= */
 	"installation": "安裝",
 	"mode": "模式",

@@ -69,6 +69,7 @@ Lang = {
 	"my_chats_with_other_roles": "My chats with other roles",
 	"role_name": "Role Name",
 	"show_role_messages": "Show role messages",
+	"go": "Go",
 /** ================================================= */
 	"installation": "Installation",
 	"mode": "Mode",

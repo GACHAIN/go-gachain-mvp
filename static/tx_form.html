@@ -305,7 +305,7 @@ function sendnet{{.Unique}}() {
 			</div>
 			<div class="clearfix">
 				<div class="pull-left">
-					<button type="button" onClick="openMap('{{.Name}}');" class="map btn btn-primary"><i class="fa fa-map-marker"></i> &nbsp;Add/Edit Coords</button>
+					<button type="button" onClick="openMap('{{.Name}}');" class="map btn btn-primary"><i class="fa fa-map-marker"></i> &nbsp;<span class="lang" lang-id="add_edit_coords"></span></button>
 				</div-->
 			</div>
 			{{end}}{{if eq .HTMLType "polymap"}}
@@ -317,7 +317,7 @@ function sendnet{{.Unique}}() {
 			</div>
 			<!--<div class="clearfix">
 				<div class="pull-left">-->
-					<button type="button" onClick="openMap('{{.Name}}{{$.Unique}}');" class="btn btn-primary"><i class="fa fa-map-marker"></i> &nbsp;Add/Edit Coords</button>
+					<button type="button" onClick="openMap('{{.Name}}{{$.Unique}}');" class="btn btn-primary"><i class="fa fa-map-marker"></i> &nbsp;<span class="lang" lang-id="add_edit_coords"></span></button>
 				<!--</div>
 			</div>-->
 			{{end}}{{if eq .HTMLType "date"}}
