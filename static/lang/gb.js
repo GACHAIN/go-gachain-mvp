@@ -78,6 +78,12 @@ Lang = {
 	"page_value_str": "Page Value (str)",
 	"null": "null",
 	"role_notifications": "Role notifications",
+	"notification_closure_type": "Notification closure type",
+	"notification_header": "Notification Header",
+	"body_text_notification": "Body text notification",
+	"name_of_the_page_for_link": "Name of the page for link",
+	"parameter_value_int_page": "Parameter value (int) for the page",
+	"parameter_value_str_page": "Parameter value (str) for the page",
 /** ================================================= */
 	"installation": "Installation",
 	"mode": "Mode",

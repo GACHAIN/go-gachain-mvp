@@ -3513,15 +3513,15 @@ PageEnd:`,
 DivsEnd:`,
 `pc_notification #= ContractConditions("MainCondition")`,
 `p_notification_send_roles #= Title:Send
-Navigation(LiTemplate(notification_view_roles, LangJS(role_notifications)), Send) 
+Navigation(LiTemplate(notification_view_roles, LangJS(role_notifications)), LangJS(send)) 
 
 If(#vS#!=1)
     SetVar(vS=1)
-    SetVar(vNotificHeader="Header for notification")
-    SetVar(vTextBody="Body text")
+    SetVar(vNotificHeader="")
+    SetVar(vTextBody="")
     SetVar(vPageName="notification_testpage")
-    SetVar(vPageValue="12")
-    SetVar(vPageValue2="string")
+    SetVar(vPageValue="0")
+    SetVar(vPageValue2="")
     SetVar(vNotificationIcon=1)
 IfEnd:
 
@@ -3540,11 +3540,11 @@ Divs:content-wrapper
                             Input(RecipientID, "form-control  m-b hidden disabled=''",integer,text,"" )
                         DivsEnd:
                         Divs(form-group)
-                            Label(Notification closure type)
+                            Label(LangJS(notification_closure_type))
                             Select(ClosureType,notification_ClosureType,form-control ,#vClosureType#)
                         DivsEnd:
                         Divs(form-group)
-                            Label(Notification Icon)
+                            Label(LangJS(notification_icon))
                             Divs: row df f-valign
                         		Divs: col-md-9 mt-sm text-left
                         		    Select(NotificationIcon,notification_icon,form-control,#vNotificationIcon#)
@@ -3560,23 +3560,23 @@ Divs:content-wrapper
                             DivsEnd:
                         DivsEnd:
                         Divs(form-group)
-                            Label(Notification Header)
+                            Label(LangJS(notification_header))
                             Input(NotificHeader, "form-control  m-b ",caption,text, #vNotificHeader#)
                         DivsEnd:
                         Divs(form-group)
-                            Label(Body text notification)
+                            Label(LangJS(body_text_notification))
                             Input(TextBody, "form-control  m-b ",caption,text, #vTextBody#)
                         DivsEnd:
                         Divs(form-group)
-                            Label(Name of the page for link)
+                            Label(LangJS(name_of_the_page_for_link))
                             Input(PageName, "form-control  m-b ",name,text, #vPageName#)
                         DivsEnd:
                         Divs(form-group)
-                            Label(Parameter value (int) for the page)
+                            Label(LangJS(parameter_value_int_page))
                             Input(PageValue, "form-control  m-b ",integer,text, #vPageValue#)
                         DivsEnd:
                         Divs(form-group)
-                            Label(Parameter value (str) for the page)
+                            Label(LangJS(parameter_value_str_page))
                             Input(PageValue2, "form-control  m-b ",integer,text, #vPageValue2#)
                         DivsEnd:
                     FormEnd:
@@ -3584,8 +3584,8 @@ Divs:content-wrapper
                 Divs(panel-footer)
                     Divs: clearfix
                         Divs: pull-right
-                            BtnPage(notification_view_roles, "Back", "", btn btn-default btn-pill-left ml4)
-                            TxButton{ClassBtn:btn btn-primary btn-pill-right, Contract:notification_send ,Name:"Send", OnSuccess: "template,notification_view_roles"}
+                            BtnPage(notification_view_roles, LangJS(back), "", btn btn-default btn-pill-left ml4)
+                            TxButton{ClassBtn:btn btn-primary btn-pill-right, Contract:notification_send ,Name:$send$, OnSuccess: "template,notification_view_roles"}
                         DivsEnd:
                     DivsEnd:
                 DivsEnd:
@@ -3627,7 +3627,7 @@ Divs:content-wrapper
                             Input(ClosureType, "form-control  m-b hidden disabled=''",integer,text,0)
                         DivsEnd:
                         Divs(form-group)
-                            Label(Notification Icon)
+                            Label(LangJS(notification_icon))
                             Divs: row df f-valign
                         		Divs: col-md-9 mt-sm text-left
                         		    Select(NotificationIcon,notification_icon,form-control,#vNotificationIcon#)
@@ -3643,23 +3643,23 @@ Divs:content-wrapper
                             DivsEnd:
                         DivsEnd:
                         Divs(form-group)
-                            Label(Notification Header)
+                            Label(LangJS(notification_header))
                             Input(NotificHeader, "form-control  m-b ",caption,text, #vNotificHeader#)
                         DivsEnd:
                         Divs(form-group)
-                            Label(Body text notification)
+                            Label(LangJS(body_text_notification))
                             Input(TextBody, "form-control  m-b ",caption,text, #vTextBody#)
                         DivsEnd:
                         Divs(form-group)
-                            Label(Name of the page for link)
+                            Label(LangJS(name_of_the_page_for_link))
                             Input(PageName, "form-control  m-b ",name,text, #vPageName#)
                         DivsEnd:
                         Divs(form-group)
-                            Label(Parameter value (int) for the page)
+                            Label(LangJS(parameter_value_int_page))
                             Input(PageValue, "form-control  m-b ",integer,text, #vPageValue#)
                         DivsEnd:
                         Divs(form-group)
-                            Label(Parameter value (str) for the page)
+                            Label(LangJS(parameter_value_str_page))
                             Input(PageValue2, "form-control  m-b ",integer,text, #vPageValue2#)
                         DivsEnd:
                     FormEnd:

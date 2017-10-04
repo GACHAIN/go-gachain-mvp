@@ -78,6 +78,12 @@ Lang = {
 	"page_value_str": "页面值 (str)",
 	"null": "无",
 	"role_notifications": "工作通知",
+	"notification_closure_type": "通知关闭类型",
+	"notification_header": "通知标题",
+	"body_text_notification": "正文文字通知",
+	"name_of_the_page_for_link": "链接页面的名称",
+	"parameter_value_int_page": "页面的参数值 (int)",
+	"parameter_value_str_page": "页面的参数值 (str)",
 /** ================================================= */
 	"installation": "安装",
 	"mode": "模式",
