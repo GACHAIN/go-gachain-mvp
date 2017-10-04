@@ -3667,8 +3667,8 @@ Divs:content-wrapper
                 Divs(panel-footer)
                     Divs: clearfix
                         Divs: pull-right
-                            BtnPage(notification_view_single, "Back", "", btn btn-default btn-pill-left ml4)
-                            TxButton{ClassBtn:btn btn-primary btn-pill-right, Contract:notification_send,Name:"Send",OnSuccess: "template,notification_view_single"}
+                            BtnPage(notification_view_single, LangJS(back), "", btn btn-default btn-pill-left ml4)
+                            TxButton{ClassBtn:btn btn-primary btn-pill-right, Contract:notification_send,Name:$send$,OnSuccess: "template,notification_view_single"}
                         DivsEnd:
                     DivsEnd:
                 DivsEnd:
