@@ -70,6 +70,12 @@ Lang = {
 	"role_name": "職務名稱",
 	"show_role_messages": "顯示職務類信息",
 	"go": "走",
+	"test_page": "測試頁面",
+	"test_page_attention": "註意！該頁面無法接收參數，且僅用於顯示。",
+	"notification_id": "",
+	"notification_type": "",
+	"page_value_int": "",
+	"page_value_str": "",
 /** ================================================= */
 	"installation": "安裝",
 	"mode": "模式",

@@ -3681,8 +3681,8 @@ DivsEnd:
 
 PageEnd:`,
 `pc_notification_send_single #= ContractConditions("MainCondition")`,
-`p_notification_testpage #= Title:Test page
-Navigation(Test page)
+`p_notification_testpage #= Title:LangJS(test_page)
+Navigation(LangJS(test_page))
 
 SetVar(type_str1 = "single")
 SetVar(type_str2 = "role")
@@ -3690,7 +3690,7 @@ SetVar(type_str2 = "role")
 If(And(#vType#!=#type_str1#,#vType#!=#type_str2#))
     Divs(md-12, panel panel-default data-sweet-alert)
         Divs(panel-footer text-center) 
-            Label("ATTENTION! The page has not received parameters and is only viewable")
+            Label(LangJS(test_page_attention))
             SetVar(vNotificID = "null")
             SetVar(vPageValue = "null")
             SetVar(vPageValue2 = "null")
@@ -3705,23 +3705,23 @@ Divs:content-wrapper
         DivsEnd:
 		Divs: col-md-6 mt-sm text-left
             Divs(md-6, panel panel-primary data-sweet-alert)
-                Div(panel-heading, Div(panel-title, Test page))
+                Div(panel-heading, Div(panel-title, LangJS(test_page)))
                 Divs(panel-body)
                     Form()
                         Divs(form-group)
-                            Label(Notification ID)
+                            Label(LangJS(notification_id))
                             Input(NotificID, "form-control  m-b disabled=''",text,text,#vNotificID#)
                         DivsEnd:
                         Divs(form-group)
-                            Label(Notification type)
+                            Label(LangJS(notification_type))
                             Input(NotificType, "form-control  m-b disabled=''",text,text,#vType#)
                         DivsEnd:
                         Divs(form-group)
-                            Label(Page Value (int))
+                            Label(LangJS(page_value_int))
                             Input(PageValue, "form-control  m-b disabled=''",text,text,#vPageValue#)
                         DivsEnd:
                         Divs(form-group)
-                            Label(Page Value (str))
+                            Label(LangJS(page_value_str))
                             Input(PageValue2, "form-control  m-b disabled=''",text,text,#vPageValue2#)
                         DivsEnd:
                     FormEnd:    

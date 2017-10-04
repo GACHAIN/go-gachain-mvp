@@ -70,6 +70,12 @@ Lang = {
 	"role_name": "Role Name",
 	"show_role_messages": "Show role messages",
 	"go": "Go",
+	"test_page": "Test page",
+	"test_page_attention": "ATTENTION! The page has not received parameters and is only viewable",
+	"notification_id": "Notification ID",
+	"notification_type": "Notification type",
+	"page_value_int": "Page Value (int)",
+	"page_value_str": "Page Value (str)",
 /** ================================================= */
 	"installation": "Installation",
 	"mode": "Mode",
