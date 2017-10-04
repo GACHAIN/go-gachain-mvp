@@ -77,6 +77,7 @@ Lang = {
 	"page_value_int": "頁面值 (int)",
 	"page_value_str": "頁面值 (str)",
 	"null": "無",
+	"role_notifications": "工作通知",
 /** ================================================= */
 	"installation": "安裝",
 	"mode": "模式",

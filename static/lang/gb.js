@@ -77,6 +77,7 @@ Lang = {
 	"page_value_int": "Page Value (int)",
 	"page_value_str": "Page Value (str)",
 	"null": "null",
+	"role_notifications": "Role notifications",
 /** ================================================= */
 	"installation": "Installation",
 	"mode": "Mode",

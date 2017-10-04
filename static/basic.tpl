@@ -3513,7 +3513,7 @@ PageEnd:`,
 DivsEnd:`,
 `pc_notification #= ContractConditions("MainCondition")`,
 `p_notification_send_roles #= Title:Send
-Navigation(LiTemplate(notification_view_roles, Role notifications), Send) 
+Navigation(LiTemplate(notification_view_roles, LangJS(role_notifications)), Send) 
 
 If(#vS#!=1)
     SetVar(vS=1)
@@ -3531,7 +3531,7 @@ Divs:content-wrapper
         DivsEnd:
 		Divs: col-md-6 mt-sm text-left
             Divs(md-6, panel panel-primary data-sweet-alert)
-                Div(panel-heading, Div(panel-title, Role notifications))
+                Div(panel-heading, Div(panel-title, LangJS(role_notifications)))
                 Divs(panel-body)
                     Form()
                         Divs(form-group)
@@ -3760,15 +3760,15 @@ DivsEnd:
 
 PageEnd:`,
 `pc_notification_testpage #= ContractConditions("MainCondition")`,
-`p_notification_view_roles #= Title:Role notifications
-Navigation(Role notifications) 
-     
+`p_notification_view_roles #= Title:LangJS(role_notifications)
+Navigation(LangJS(role_notifications)) 
+
 AutoUpdate(2)
 Include(notification)
 AutoUpdateEnd:
         
 Divs(md-12, panel panel-primary data-sweet-alert)
-    Div(panel-heading, Div(panel-title, "Role notifications"))
+    Div(panel-heading, Div(panel-title, LangJS(role_notifications)))
     Divs(panel-body)
         Divs(table-responsive)
         Table{
@@ -3796,7 +3796,7 @@ Divs(md-12, panel panel-primary data-sweet-alert)
             Divs: pull-left
             DivsEnd:
             Divs: pull-right
-                BtnPage(notification_send_roles, Send, "",  btn btn-primary)
+                BtnPage(notification_send_roles, LangJS(send), "",  btn btn-primary)
             DivsEnd:
         DivsEnd:
     DivsEnd:    
