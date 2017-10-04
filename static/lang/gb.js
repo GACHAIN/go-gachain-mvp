@@ -76,6 +76,7 @@ Lang = {
 	"notification_type": "Notification type",
 	"page_value_int": "Page Value (int)",
 	"page_value_str": "Page Value (str)",
+	"null": "null",
 /** ================================================= */
 	"installation": "Installation",
 	"mode": "Mode",
