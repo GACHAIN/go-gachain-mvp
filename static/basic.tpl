@@ -3599,15 +3599,15 @@ DivsEnd:
 PageEnd:`,
 `pc_notification_send_roles #= ContractConditions("MainCondition")`,
 `p_notification_send_single #= Title:Send
-Navigation(LiTemplate(notification_view_single, Single notifications), Send)
+Navigation(LiTemplate(notification_view_single, LangJS(single_notifications)), LangJS(send))
 
 If(#vS#!=1)
     SetVar(vS=1)
-    SetVar(vNotificHeader="Header for notification")
-    SetVar(vTextBody="Body text")
+    SetVar(vNotificHeader="")
+    SetVar(vTextBody="")
     SetVar(vPageName="notification_testpage")
-    SetVar(vPageValue="12")
-    SetVar(vPageValue2="string")
+    SetVar(vPageValue="0")
+    SetVar(vPageValue2="")
     SetVar(vNotificationIcon=1)
 IfEnd:
 
@@ -3617,11 +3617,11 @@ Divs:content-wrapper
         DivsEnd:
 		Divs: col-md-6 mt-sm text-left
             Divs(md-6, panel panel-primary data-sweet-alert)
-                Div(panel-heading, Div(panel-title, Single notifications))
+                Div(panel-heading, Div(panel-title, LangJS(single_notifications)))
                 Divs(panel-body)
                     Form()
                         Divs(form-group)
-                            Label(Recipient ID)
+                            Label(LangJS(recipient_id))
                             InputAddress(RecipientID, "form-control m-b", #vRecipientID#)
                             Input(RoleID, "form-control  m-b hidden disabled=''",integer,text,0 )
                             Input(ClosureType, "form-control  m-b hidden disabled=''",integer,text,0)
@@ -3804,15 +3804,15 @@ DivsEnd:
 
 PageEnd:`,
 `pc_notification_view_roles #= ContractConditions("MainCondition")`,
-`p_notification_view_single #= Title:Single notifications
-Navigation(Single notifications)
+`p_notification_view_single #= Title:LangJS(single_notifications)
+Navigation(LangJS(single_notifications))
    
 AutoUpdate(2)
 Include(notification)
 AutoUpdateEnd:
         
 Divs(md-12, panel panel-primary data-sweet-alert)
-    Div(panel-heading, Div(panel-title, "Single notifications"))
+    Div(panel-heading, Div(panel-title, LangJS(single_notifications)))
     Divs(panel-body)
         Divs(table-responsive)
         Table{

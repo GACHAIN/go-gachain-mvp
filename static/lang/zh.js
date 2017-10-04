@@ -84,6 +84,8 @@ Lang = {
 	"name_of_the_page_for_link": "链接页面的名称",
 	"parameter_value_int_page": "页面的参数值 (int)",
 	"parameter_value_str_page": "页面的参数值 (str)",
+	"single_notifications": "个人通知",
+	"recipient_id": "接受者 ID",
 /** ================================================= */
 	"installation": "安装",
 	"mode": "模式",

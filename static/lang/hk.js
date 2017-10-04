@@ -84,6 +84,8 @@ Lang = {
 	"name_of_the_page_for_link": "鏈接頁面的名稱",
 	"parameter_value_int_page": "頁面的參數值 (int)",
 	"parameter_value_str_page": "頁面的參數值 (str)",
+	"single_notifications": "個人通知",
+	"recipient_id": "接受者 ID",
 /** ================================================= */
 	"installation": "安裝",
 	"mode": "模式",

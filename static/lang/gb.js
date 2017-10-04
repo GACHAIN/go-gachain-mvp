@@ -84,6 +84,8 @@ Lang = {
 	"name_of_the_page_for_link": "Name of the page for link",
 	"parameter_value_int_page": "Parameter value (int) for the page",
 	"parameter_value_str_page": "Parameter value (str) for the page",
+	"single_notifications": "Single notifications",
+	"recipient_id": "Recipient ID",
 /** ================================================= */
 	"installation": "Installation",
 	"mode": "Mode",
