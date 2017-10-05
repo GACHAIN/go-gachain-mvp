@@ -3328,7 +3328,7 @@ Divs:content-wrapper
                         
                             If(#vMemberStatus#==1)
                                 Divs(form-group)
-                                    Label(Date expiration)
+                                    Label(LangJS(date_expiration))
                                     Divs(input-group)
                                         Input(DateExpiration, "form-control  m-b disabled=''", text, text, "Limit can not be set for a member")
                                 	    Input(isDateExpiration, "form-control  m-b hidden disabled=''", text, text, 0)
@@ -3339,7 +3339,7 @@ Divs:content-wrapper
                                 DivsEnd:
                             Else:
                                 Divs(form-group)
-                                    Label(Date expiration)
+                                    Label(LangJS(date_expiration))
                                     Divs(input-group)
                                         InputDate(DateExpiration,form-control, #vDateExpiration#)
                                 		    Input(isDateExpiration, "form-control  m-b hidden disabled=''", text, text, 1)
@@ -3352,7 +3352,7 @@ Divs:content-wrapper
                             
                         Else:
                             Divs(form-group)
-                                Label(Date expiration)
+                                Label(LangJS(date_expiration))
                                 Divs(input-group)
                                     Input(DateExpiration, "form-control  m-b disabled=''", text, text, "Not limited")
                                     Input(isDateExpiration, "form-control  m-b hidden disabled=''", text, text, 0)
@@ -4286,8 +4286,8 @@ DivsEnd:
 
 PageEnd:`,
 `pc_tokens_accounts_list #= ContractConditions("MainCondition")`,
-`p_tokens_create #= Title:Create tokens
-Navigation(LiTemplate(tokens_list, Tokens), Create tokens) 
+`p_tokens_create #= Title:LangJS(create_tokens)
+Navigation(LiTemplate(tokens_list, LangJS(tokens)), LangJS(create_tokens)) 
 
 If(#isDateExpiration#==1)
     SetVar(isDateExpiration=1)
@@ -4307,16 +4307,16 @@ Divs:content-wrapper
         DivsEnd:
 		Divs: col-md-6 mt-sm text-left
             Divs(md-6, panel panel-primary data-sweet-alert)
-                Div(panel-heading, Div(panel-title, Create tokens))
+                Div(panel-heading, Div(panel-title, LangJS(create_tokens)))
                 Divs(panel-body)
                     Form()
                         Divs(form-group)
-                            Label(Name)
+                            Label(LangJS(name))
                             Input(NameTokens, "form-control  m-b ",text,text)
                         DivsEnd:
                         If(#isDateExpiration#==1)
                             Divs(form-group)
-                                Label(Date expiration)
+                                Label(LangJS(date_expiration))
                                 Divs(input-group)
                                     InputDate(DateExpiration,form-control,Now(YYYY.MM.DD 00:00,5 days))
                                     Divs(input-group-btn)
@@ -4326,7 +4326,7 @@ Divs:content-wrapper
                             DivsEnd:  
                         Else:
                             Divs(form-group)
-                                Label(Date expiration)
+                                Label(LangJS(date_expiration))
                                 Divs(input-group)
                                     Input(NotLimited, "form-control  m-b disabled=''", text, text, "Not limited")
                                     Divs(input-group-btn)
@@ -4336,15 +4336,15 @@ Divs:content-wrapper
                             DivsEnd:  
                         IfEnd:
                         Divs(form-group)
-                            Label(Type emission)
+                            Label(LangJS(type_emission))
                             Select(TypeEmission,tokens_type_emission,form-control, #vTypeEmission#)
                         DivsEnd:
                         Divs(form-group)
-                            Label(Rollback tokens)
+                            Label(LangJS(rollback_tokens))
                             Select(RollbackTokens,tokens_rollback_tokens,form-control, #vRollbackTokens#)
                         DivsEnd:
                         Divs(form-group)
-                            Label(Amount)
+                            Label(LangJS(amount))
                             Input(Amount, "form-control  m-b ",text,text,#vAmount#)
                         DivsEnd:
                         Input(isDateExpiration, "form-control  m-b hidden disabled=''", text, text, #isDateExpiration#)
@@ -4354,12 +4354,12 @@ Divs:content-wrapper
                     Divs: clearfix
                         If(#isDateExpiration#==1)
                             Divs: pull-right
-                                BtnPage(tokens_list, "Back", "", btn btn-default btn-pill-left ml4)
+                                BtnPage(tokens_list, LangJS(back), "", btn btn-default btn-pill-left ml4)
                                 TxButton{ClassBtn:btn btn-primary btn-pill-right, Contract:tokens_Emission,Name:"Execute", Inputs:"TypeEmission=TypeEmission,RollbackTokens=RollbackTokens,Amount=Amount,isDateExpiration=isDateExpiration,DateExpiration=DateExpiration",OnSuccess: "template,tokens_list"}
                             DivsEnd:
                         Else:
                             Divs: pull-right
-                                BtnPage(tokens_list, "Back", "", btn btn-default btn-pill-left ml4)
+                                BtnPage(tokens_list, LangJS(back), "", btn btn-default btn-pill-left ml4)
                                 TxButton{ClassBtn:btn btn-primary btn-pill-right, Contract:tokens_Emission,Name:"Execute", Inputs:"NameTokens=NameTokens,TypeEmission=TypeEmission,RollbackTokens=RollbackTokens,Amount=Amount,isDateExpiration=isDateExpiration,DateExpiration=isDateExpiration",OnSuccess: "template,tokens_list"}
                             DivsEnd:
                         IfEnd:
@@ -4387,11 +4387,11 @@ Divs:content-wrapper
                 Divs(panel-body)
                     Form()
                         Divs(form-group)
-                            Label(Account)
+                            Label(LangJS(account))
                             Input(InputAccount, "form-control  m-b disabled=''",text,text,StateVal(tokens_accounts_type,1))
                         DivsEnd:
                         Divs(form-group)
-                            Label(Amount)
+                            Label(LangJS(amount))
                             Input( Amount, "form-control  m-b ",text,text,100.00)
                         DivsEnd:
                     FormEnd:
@@ -4413,12 +4413,12 @@ DivsEnd:
 
 PageEnd:`,
 `pc_tokens_emission #= ContractConditions("MainCondition")`,
-`p_tokens_list #= Title:Tokens 
-Navigation(Tokens)
+`p_tokens_list #= Title:LangJS(tokens)
+Navigation(LangJS(tokens))
    
 SetVar(smName="tokens_Close")   
 Divs(md-12, panel panel-primary data-sweet-alert)
-    Div(panel-heading, Div(panel-title, "Tokens"))
+    Div(panel-heading, Div(panel-title, LangJS(tokens)))
     Divs(panel-body)
         Divs(table-responsive)
             Table{
@@ -4442,10 +4442,10 @@ Divs(md-12, panel panel-primary data-sweet-alert)
     Divs(panel-footer)
         Divs:clearfix 
             Divs: pull-left
-                BtnContract(tokens_CheckingClose, <b>Check to close</b>,Do you want to check to close the token?,"",'btn btn-danger btn-block',template,tokens_list)
+                BtnContract(tokens_CheckingClose, LangJS(check_to_close),Do you want to check to close the token?,"",'btn btn-danger btn-block',template,tokens_list)
             DivsEnd:
             Divs: pull-right
-                BtnPage(tokens_create, Create new, "",  btn btn-primary)
+                BtnPage(tokens_create, LangJS(create_new), "",  btn btn-primary)
             DivsEnd:
         DivsEnd:
     DivsEnd:    
@@ -4453,8 +4453,8 @@ DivsEnd:
 
 PageEnd:`,
 `pc_tokens_list #= ContractConditions("MainCondition")`,
-`p_tokens_money_rollback #= Title:Money rollback 
-Navigation(Money rollback)
+`p_tokens_money_rollback #= Title:LangJS(money_rollback)
+Navigation(LangJS(money_rollback))
 
 Divs:content-wrapper 
     Divs: row df f-valign
@@ -4462,11 +4462,11 @@ Divs:content-wrapper
         DivsEnd:
 		Divs: col-md-6 mt-sm text-left
             Divs(md-6, panel panel-primary data-sweet-alert)
-                Div(panel-heading, Div(panel-title, Money rollback))
+                Div(panel-heading, Div(panel-title, LangJS(money_rollback)))
                 Divs(panel-body)
                     Form()
                         Divs(form-group)
-                            Label(Account ID for rollback)
+                            Label(LangJS(account_id_for_rollback))
                             Divs(input-group)
                                 Select(SenderAccountID, #state_id#_accounts.id, "form-control m-b",#vSenderAccID#)
                                 Divs(input-group-btn)
@@ -4481,7 +4481,7 @@ Divs:content-wrapper
                                 
                                 Divs: row df f-valign
                             		Divs: col-md-6 mt-sm text-right
-                         		        Div(h5 text-normal, "Balance:")
+                         		        Div(h5 text-normal, LangJS(balance))
                                     DivsEnd:
                             		Divs: col-md-6 mt-sm text-left
                          		        Div(h5 text-normal,  Money(#acc_amount#))
@@ -4490,7 +4490,7 @@ Divs:content-wrapper
                                 
                                 Divs: row df f-valign
                             		Divs: col-md-6 mt-sm text-right
-                         		        Div(h5 text-normal, "Account Type:")
+                         		        Div(h5 text-normal, LangJS(account_type))
                                     DivsEnd:
                             		Divs: col-md-6 mt-sm text-left
                          		        Div(h5 text-normal, StateVal(tokens_accounts_type,#acc_type#) )
@@ -4499,7 +4499,7 @@ Divs:content-wrapper
                                 
                                 Divs: row df f-valign
                             		Divs: col-md-6 mt-sm text-right
-                         		        Div(h5 text-normal, "Status:")
+                         		        Div(h5 text-normal, LangJS(status))
                                     DivsEnd:
                             		Divs: col-md-6 mt-sm text-left
                          		        Div(h5 text-normal, If(#acc_onhold#==0,"active","onHold"))
@@ -4508,7 +4508,7 @@ Divs:content-wrapper
 
                                 Divs: row df f-valign
                             		Divs: col-md-6 mt-sm text-right
-                                        Div(h5 text-normal, "Citizen:")
+                                        Div(h5 text-normal, LangJS(citizen_word))
                                     DivsEnd:
                             		Divs: col-md-6 mt-sm text-left
                                         Div(h5 text-normal, Image(If(GetVar(citizen_avatar)!=="", #citizen_avatar#, "/static/img/apps/ava.png"), Avatar, img-thumbnail img-circle thumb-full w-30 h-30),   #citizen_name#)
@@ -4517,7 +4517,7 @@ Divs:content-wrapper
                             IfEnd:
                         DivsEnd: 
                         Divs(form-group)
-                            Label(Amount)
+                            Label(LangJS(amount))
                             Input(Amount, "form-control  m-b ",text,text,50.00)
                         DivsEnd:
                     FormEnd:
@@ -4566,7 +4566,7 @@ Divs:content-wrapper
                                 
                                 Divs: row df f-valign
                             		Divs: col-md-6 mt-sm text-right
-                         		    Div(h5 text-normal, "Balance:")
+                         		    Div(h5 text-normal, LangJS(balance))
                                     DivsEnd:
                             		Divs: col-md-6 mt-sm text-left
                          		    Div(h5 text-normal, Money(#acc_amount#))
@@ -4575,7 +4575,7 @@ Divs:content-wrapper
                                 
                                 Divs: row df f-valign
                             		Divs: col-md-6 mt-sm text-right
-                         		    Div(h5 text-normal, "Account Type:")
+                         		    Div(h5 text-normal, LangJS(account_type))
                                     DivsEnd:
                             		Divs: col-md-6 mt-sm text-left
                          		    Div(h5 text-normal, StateVal(tokens_accounts_type,#acc_type#))
@@ -4584,7 +4584,7 @@ Divs:content-wrapper
 
                                 Divs: row df f-valign
                             		Divs: col-md-6 mt-sm text-right
-                         		    Div(h5 text-normal, "Status:")
+                         		    Div(h5 text-normal, LangJS(status))
                                     DivsEnd:
                             		Divs: col-md-6 mt-sm text-left
                          		    Div(h5 text-normal, If(#acc_onhold#==0,"active","onHold"))
@@ -4593,7 +4593,7 @@ Divs:content-wrapper
 
                                 Divs: row df f-valign
                             		Divs: col-md-6 mt-sm text-right
-                                    Div(h5 text-normal, "Citizen:")
+                                    Div(h5 text-normal, LangJS(citizen_word))
                                     DivsEnd:
                             		Divs: col-md-6 mt-sm text-left
                                     Div(h5 text-normal, Image(If(GetVar(citizen_avatar)!=="", #citizen_avatar#, "/static/img/apps/ava.png"), Avatar, img-thumbnail img-circle thumb-full w-30 h-30),   #citizen_name#)
@@ -4617,7 +4617,7 @@ Divs:content-wrapper
                                 
                                 Divs: row df f-valign
                             		Divs: col-md-6 mt-sm text-right
-                         		    Div(h5 text-normal, "Balance:")
+                         		    Div(h5 text-normal, LangJS(balance))
                                     DivsEnd:
                             		Divs: col-md-6 mt-sm text-left
                          		    Div(h5 text-normal, Money(#acc_amount#))
@@ -4626,7 +4626,7 @@ Divs:content-wrapper
                                 
                                 Divs: row df f-valign
                             		Divs: col-md-6 mt-sm text-right
-                         		    Div(h5 text-normal, "Account Type:")
+                         		    Div(h5 text-normal, LangJS(account_type))
                                     DivsEnd:
                             		Divs: col-md-6 mt-sm text-left
                          		    Div(h5 text-normal, StateVal(tokens_accounts_type,#acc_type#))
@@ -4635,7 +4635,7 @@ Divs:content-wrapper
 
                                 Divs: row df f-valign
                             		Divs: col-md-6 mt-sm text-right
-                         		    Div(h5 text-normal, "Status:")
+                         		    Div(h5 text-normal, LangJS(status))
                                     DivsEnd:
                             		Divs: col-md-6 mt-sm text-left
                          		    Div(h5 text-normal, If(#acc_onhold#==0,"active","onHold"))
@@ -4644,7 +4644,7 @@ Divs:content-wrapper
 
                                 Divs: row df f-valign
                             		Divs: col-md-6 mt-sm text-right
-                                    Div(h5 text-normal, "Citizen:")
+                                    Div(h5 text-normal, LangJS(citizen_word))
                                     DivsEnd:
                             		Divs: col-md-6 mt-sm text-left
                                     Div(h5 text-normal, Image(If(GetVar(citizen_avatar)!=="", #citizen_avatar#, "/static/img/apps/ava.png"), Avatar, img-thumbnail img-circle thumb-full w-30 h-30),   #citizen_name#)
@@ -4653,7 +4653,7 @@ Divs:content-wrapper
                             IfEnd:
                         DivsEnd:
                         Divs(form-group)
-                            Label(Amount)
+                            Label(LangJS(amount))
                             Input(Amount, "form-control  m-b ",text,text,12.50)
                         DivsEnd:
                     FormEnd:
@@ -4674,7 +4674,7 @@ DivsEnd:
 
 PageEnd:`,
 `pc_tokens_money_transfer #= ContractConditions("MainCondition")`,
-`p_tokens_money_transfer_agency #= Title:Money transfer (for agency)
+`p_tokens_money_transfer_agency #= Title:LangJS(money_transfer_for_agency)
 Navigation(LangJS(money_transfer))
 
 SetVar(person_acc=3)
@@ -4705,7 +4705,7 @@ Divs:content-wrapper
                                 
                                 Divs: row df f-valign
                             		Divs: col-md-6 mt-sm text-right
-                         		    Div(h5 text-normal, "Balance:")
+                         		    Div(h5 text-normal, LangJS(balance))
                                     DivsEnd:
                             		Divs: col-md-6 mt-sm text-left
                          		    Div(h5 text-normal, Money(#acc_amount#))
@@ -4714,7 +4714,7 @@ Divs:content-wrapper
                                 
                                 Divs: row df f-valign
                             		Divs: col-md-6 mt-sm text-right
-                         		    Div(h5 text-normal, "Account Type:")
+                         		    Div(h5 text-normal, LangJS(account_type))
                                     DivsEnd:
                             		Divs: col-md-6 mt-sm text-left
                          		    Div(h5 text-normal, StateVal(tokens_accounts_type,#acc_type#))
@@ -4723,7 +4723,7 @@ Divs:content-wrapper
 
                                 Divs: row df f-valign
                             		Divs: col-md-6 mt-sm text-right
-                         		    Div(h5 text-normal, "Status:")
+                         		    Div(h5 text-normal, LangJS(status))
                                     DivsEnd:
                             		Divs: col-md-6 mt-sm text-left
                          		    Div(h5 text-normal, If(#acc_onhold#==0,"active","onHold"))
@@ -4732,7 +4732,7 @@ Divs:content-wrapper
 
                                 Divs: row df f-valign
                             		Divs: col-md-6 mt-sm text-right
-                                    Div(h5 text-normal, "Citizen:")
+                                    Div(h5 text-normal, LangJS(citizen_word))
                                     DivsEnd:
                             		Divs: col-md-6 mt-sm text-left
                                     Div(h5 text-normal, Image(If(GetVar(citizen_avatar)!=="", #citizen_avatar#, "/static/img/apps/ava.png"), Avatar, img-thumbnail img-circle thumb-full w-30 h-30),   #citizen_name#)
@@ -4741,7 +4741,7 @@ Divs:content-wrapper
                             IfEnd:
                         DivsEnd:
                         Divs(form-group)
-                            Label(Amount)
+                            Label(LangJS(amount))
                             Input(Amount, "form-control  m-b ",text,text,12.50)
                         DivsEnd:
                     FormEnd:
@@ -4765,7 +4765,7 @@ DivsEnd:
 
 PageEnd:`,
 `pc_tokens_money_transfer_agency #= ContractConditions("MainCondition")`,
-`p_tokens_money_transfer_company #= Title:Money transfer (for company)
+`p_tokens_money_transfer_company #= Title:LangJS(money_transfer_for_company)
 Navigation(LangJS(money_transfer))
 
 SetVar(person_acc=3)
@@ -4796,7 +4796,7 @@ Divs:content-wrapper
                                 
                                 Divs: row df f-valign
                             		Divs: col-md-6 mt-sm text-right
-                         		    Div(h5 text-normal, "Balance:")
+                         		    Div(h5 text-normal, LangJS(balance))
                                     DivsEnd:
                             		Divs: col-md-6 mt-sm text-left
                          		    Div(h5 text-normal, Money(#acc_amount#))
@@ -4805,7 +4805,7 @@ Divs:content-wrapper
                                 
                                 Divs: row df f-valign
                             		Divs: col-md-6 mt-sm text-right
-                         		    Div(h5 text-normal, "Account Type:")
+                         		    Div(h5 text-normal, LangJS(account_type))
                                     DivsEnd:
                             		Divs: col-md-6 mt-sm text-left
                          		    Div(h5 text-normal, StateVal(tokens_accounts_type,#acc_type#))
@@ -4814,7 +4814,7 @@ Divs:content-wrapper
 
                                 Divs: row df f-valign
                             		Divs: col-md-6 mt-sm text-right
-                         		    Div(h5 text-normal, "Status:")
+                         		    Div(h5 text-normal, LangJS(status))
                                     DivsEnd:
                             		Divs: col-md-6 mt-sm text-left
                          		    Div(h5 text-normal, If(#acc_onhold#==0,"active","onHold"))
@@ -4823,7 +4823,7 @@ Divs:content-wrapper
 
                                 Divs: row df f-valign
                             		Divs: col-md-6 mt-sm text-right
-                                    Div(h5 text-normal, "Citizen:")
+                                    Div(h5 text-normal, LangJS(citizen_word))
                                     DivsEnd:
                             		Divs: col-md-6 mt-sm text-left
                                     Div(h5 text-normal, Image(If(GetVar(citizen_avatar)!=="", #citizen_avatar#, "/static/img/apps/ava.png"), Avatar, img-thumbnail img-circle thumb-full w-30 h-30),   #citizen_name#)
@@ -4832,7 +4832,7 @@ Divs:content-wrapper
                             IfEnd:
                         DivsEnd:
                         Divs(form-group)
-                            Label(Amount)
+                            Label(LangJS(amount))
                             Input(Amount, "form-control  m-b ",text,text,12.50)
                         DivsEnd:
                     FormEnd:
@@ -4887,7 +4887,7 @@ Divs:content-wrapper
                                 
                                 Divs: row df f-valign
                             		Divs: col-md-6 mt-sm text-right
-                         		    Div(h5 text-normal, "Balance:")
+                         		    Div(h5 text-normal, LangJS(balance))
                                     DivsEnd:
                             		Divs: col-md-6 mt-sm text-left
                          		    Div(h5 text-normal, Money(#acc_amount#))
@@ -4896,7 +4896,7 @@ Divs:content-wrapper
                                 
                                 Divs: row df f-valign
                             		Divs: col-md-6 mt-sm text-right
-                         		    Div(h5 text-normal, "Account Type:")
+                         		    Div(h5 text-normal, LangJS(account_type))
                                     DivsEnd:
                             		Divs: col-md-6 mt-sm text-left
                          		    Div(h5 text-normal, StateVal(tokens_accounts_type,#acc_type#))
@@ -4905,7 +4905,7 @@ Divs:content-wrapper
 
                                 Divs: row df f-valign
                             		Divs: col-md-6 mt-sm text-right
-                         		    Div(h5 text-normal, "Status:")
+                         		    Div(h5 text-normal, LangJS(status))
                                     DivsEnd:
                             		Divs: col-md-6 mt-sm text-left
                          		    Div(h5 text-normal, If(#acc_onhold#==0,"active","onHold"))
@@ -4914,7 +4914,7 @@ Divs:content-wrapper
 
                                 Divs: row df f-valign
                             		Divs: col-md-6 mt-sm text-right
-                                    Div(h5 text-normal, "Citizen:")
+                                    Div(h5 text-normal, LangJS(citizen_word))
                                     DivsEnd:
                             		Divs: col-md-6 mt-sm text-left
                                     Div(h5 text-normal, Image(If(GetVar(citizen_avatar)!=="", #citizen_avatar#, "/static/img/apps/ava.png"), Avatar, img-thumbnail img-circle thumb-full w-30 h-30),   #citizen_name#)
@@ -4923,7 +4923,7 @@ Divs:content-wrapper
                             IfEnd:
                         DivsEnd:
                         Divs(form-group)
-                            Label(Amount)
+                            Label(LangJS(amount))
                             Input(Amount, "form-control  m-b ",text,text,12.50)
                         DivsEnd:
                     FormEnd:
@@ -5015,7 +5015,7 @@ Divs:content-wrapper
                 Divs(panel-footer)
                     Divs: clearfix
                         Divs: pull-right
-                            BtnPage(voting_list, Back, "Status:1",btn btn-default btn-pill-left ml4)
+                            BtnPage(voting_list, LangJS(back), "Status:1",btn btn-default btn-pill-left ml4)
                             TxButton{ClassBtn:btn btn-primary btn-pill-right, Contract: votingCreateNew, Name: Create, OnSuccess: "template,voting_list"}
                         DivsEnd:
                     DivsEnd:
@@ -6026,9 +6026,9 @@ SetVar(`pa_buildings_use_class #= Shops, Financial and professional services, Re
 `pac_roles_types #= ContractConditions("MainCondition")`,
 `pa_tokens_accounts_type #= sys-emission,sys-trash,person,agency,company`,
 `pac_tokens_accounts_type #= ContractConditions("MainCondition")`,
-`pa_tokens_rollback_tokens #= Impossible,Possible`,
+`pa_tokens_rollback_tokens #= $impossible$,$possible$`,
 `pac_tokens_rollback_tokens #= ContractConditions("MainCondition")`,
-`pa_tokens_type_emission #= Limited,Unlimited`,
+`pa_tokens_type_emission #= $limited$,$unlimited$`,
 `pac_tokens_type_emission #= ContractConditions("MainCondition")`,
 `pa_type_voting #= voting_type_candidate_manual,voting_type_candidate_requests,voting_type_document,voting_type_table`,
 `pac_type_voting #= ContractConditions("MainCondition")`,
