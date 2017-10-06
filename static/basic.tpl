@@ -3223,8 +3223,8 @@ DivsEnd:
 
 PageEnd:`,
 `pc_LandRegistry #= ContractConditions("MainCondition")`,
-`p_members_list #= Title:Members
-Navigation(Members) 
+`p_members_list #= Title:LangJS(members)
+Navigation(LangJS(members)) 
 
 If(#isSearch#==1)
     SetVar(vWhere="name = '#MemberName#'")
@@ -3233,17 +3233,17 @@ Else:
 IfEnd:
         
 Divs(md-12, panel panel-primary data-sweet-alert)
-    Div(panel-heading, Div(panel-title, "Members"))
+    Div(panel-heading, Div(panel-title, LangJS(members)))
     Divs(panel-body)
         Divs: row df f-valign
 			Divs: col-md-1 mt-sm text-right
-			    Div(text-bold, "Name:")
+			    Div(text-bold, LangJS(name))
             DivsEnd:
 			Divs: col-md-10 mt-sm text-left
                 Input(StrSearch, "form-control  m-b")
             DivsEnd:
             Divs: col-md-1 mt-sm
-                TxButton { Contract:roles_Search, Name: Search, OnSuccess: "template,members_list,MemberName:Val(StrSearch),isSearch:1" }
+                TxButton { Contract:roles_Search, Name: $search$, OnSuccess: "template,members_list,MemberName:Val(StrSearch),isSearch:1" }
             DivsEnd:
         DivsEnd:
         Div(text-bold, <br>)
@@ -3255,12 +3255,12 @@ Divs(md-12, panel panel-primary data-sweet-alert)
             Where: #vWhere#
             Columns:
             [
-                [ Member,  SetVar(style=If(#person_status#==-1,"text-muted","text-normal")) Div(#style# text-bold, Image(If(GetVar(avatar)!=="", #avatar#, "/static/img/apps/ava.png"), Avatar, img-thumbnail img-circle thumb-full h-30 w-30)   If(#person_status#==-1, #name#, LinkPage(CitizenInfo, #name#, "citizenId:'#id#',gstate_id:#state_id#",profile-flag text-blue) ) ) , text-center h4 align="center"],
-                [ Member ID,  Div(#style# text-bold, Address(#id#) Em(clipboard fa fa-clipboard id="clipboard" aria-hidden="true" data-clipboard-action="copy" data-clipboard-text=Address(#id#) onClick="CopyToClipboard('#clipboard')", ) ), text-center h4 align="center" width="215"],
-                [ Date accept, Div(#style# text-center, DateTime(#date_start#, DD.MM.YYYY HH:MI) ), text-center h4 align="center" width="125" ],
-                [ Expiration, Div(#style# text-center, DateTime(#date_expiration#, DD.MM.YYYY HH:MI) ), text-center h4 align="center" width="125" ],
-                [ Date delete, Div(#style# text-center, DateTime(#date_end#, DD.MM.YYYY HH:MI) ), text-center h4 align="center" width="125" ],
-                [ Status, If(#person_status#>0, Div(#style# text-bold text-center, StateVal(members_request_status,#person_status#)), If(#person_status#==-1, Div(#style# text-bold text-center, "Deleted"))), text-center h4 align="center" width="70" ],
+                [ $member$,  SetVar(style=If(#person_status#==-1,"text-muted","text-normal")) Div(#style# text-bold, Image(If(GetVar(avatar)!=="", #avatar#, "/static/img/apps/ava.png"), Avatar, img-thumbnail img-circle thumb-full h-30 w-30)   If(#person_status#==-1, #name#, LinkPage(CitizenInfo, #name#, "citizenId:'#id#',gstate_id:#state_id#",profile-flag text-blue) ) ) , text-center h4 align="center"],
+                [ $member_id$,  Div(#style# text-bold, Address(#id#) Em(clipboard fa fa-clipboard id="clipboard" aria-hidden="true" data-clipboard-action="copy" data-clipboard-text=Address(#id#) onClick="CopyToClipboard('#clipboard')", ) ), text-center h4 align="center" width="215"],
+                [ $date_accept$, Div(#style# text-center, DateTime(#date_start#, DD.MM.YYYY HH:MI) ), text-center h4 align="center" width="125" ],
+                [ $expiration$, Div(#style# text-center, DateTime(#date_expiration#, DD.MM.YYYY HH:MI) ), text-center h4 align="center" width="125" ],
+                [ $date_delete$, Div(#style# text-center, DateTime(#date_end#, DD.MM.YYYY HH:MI) ), text-center h4 align="center" width="125" ],
+                [ $status$, If(#person_status#>0, Div(#style# text-bold text-center, StateVal(members_request_status,#person_status#)), If(#person_status#==-1, Div(#style# text-bold text-center, "Deleted"))), text-center h4 align="center" width="70" ],
                 [ , SetVar(address_m = Address(#id#)) SetVar(date_e = DateTime(#date_expiration#, DD.MM.YYYY HH:MI)) SetVar(isDateExp = If(#date_expiration#,1,0)) Div(text-center, If(#person_status#<0, "", BtnPage(members_request_edit, Em(fa fa-edit), "isChange:1,vMemberID:'#id#',vMemberName:'#name#',vMemberStatus:'#person_status#',vDateExpiration:'#date_e#',isDateExpiration:#isDateExp#",  btn btn-primary))), text-center align="center" width="60" ],
                 [ , SetVar(address_m = Address(#id#)) Div(text-center, If(#person_status#>0, BtnContract(members_Delete, Em(fa fa-close),Do you want to delete this member?,"MemberId:'#address_m#'",'btn btn-danger btn-block',template,members_list), If(#person_status#==-1, BtnContract(members_Return, Em(fa fa-reorder), Do you want to return this member?,"MemberId:'#address_m#'",'btn btn-success btn-block',template,members_list)) )), text-center align="center" width="60" ]
             ]
@@ -3269,7 +3269,7 @@ Divs(md-12, panel panel-primary data-sweet-alert)
         If(#isSearch#==1)
             Div(h4 m0 text-bold text-left, <br>)
             Divs(text-center)
-                    BtnPage(members_list, <b>View all</b>,"isSearch:0",btn btn-primary btn-oval)
+                    BtnPage(members_list, LangJS(view_all),"isSearch:0",btn btn-primary btn-oval)
             DivsEnd:
         IfEnd:
     DivsEnd:
@@ -3298,8 +3298,8 @@ DivsEnd:
 
 PageEnd:`,
 `pc_members_list #= ContractConditions("MainCondition")`,
-`p_members_request_edit #= If(#isChange#==1, Title:Change, Title:Accept)
-Navigation(LiTemplate(members_list,Members), If(#isChange#==1, Change, Accept))
+`p_members_request_edit #= If(#isChange#==1, Title:LangJS(change), Title:LangJS(accept))
+Navigation(LiTemplate(members_list,Members), If(#isChange#==1, LangJS(change), LangJS(accept)))
 
 SetVar(vDateExpiration = If(#vDateExpiration#,#vDateExpiration#,Now(YYYY.MM.DD 00:00,5 days)))
 
@@ -3309,19 +3309,19 @@ Divs:content-wrapper
         DivsEnd:
 		Divs: col-md-6 mt-sm text-left
             Divs(md-6, panel panel-success data-sweet-alert)
-                Div(panel-heading, Div(panel-title, Request))
+                Div(panel-heading, Div(panel-title, LangJS(request)))
                 Divs(panel-body)
                     Form()
                         Divs(form-group)
-                            Label(Member ID)
+                            Label(LangJS(member_id))
                             If(#isChange#==1, Input(MemberID, "form-control  m-b disabled=''",caption,text, Address(#vMemberID#)), Input(MemberID, "form-control  m-b disabled=''",caption,text, #vMemberID#))
                         DivsEnd:
                         Divs(form-group)
-                            Label(Member name)
+                            Label(LangJS(member_name))
                             Input(MemberName, "form-control  m-b disabled=''",caption,text, #vMemberName#)
                         DivsEnd:
                         Divs(form-group)
-                            Label(Status)
+                            Label(LangJS(status))
                             Select(MemberStatus,members_request_status,form-control,#vMemberStatus#)
                         DivsEnd:
                         If(#isDateExpiration#==1)
@@ -3354,7 +3354,7 @@ Divs:content-wrapper
                             Divs(form-group)
                                 Label(LangJS(date_expiration))
                                 Divs(input-group)
-                                    Input(DateExpiration, "form-control  m-b disabled=''", text, text, "Not limited")
+                                    Input(DateExpiration, "form-control  m-b disabled=''", text, text, $not_limited$)
                                     Input(isDateExpiration, "form-control  m-b hidden disabled=''", text, text, 0)
                                     Divs(input-group-btn)
                                     BtnPage(members_request_edit, Em(fa fa-plus), "isDateExpiration:1,vDateExpiration:'#vDateExpiration#',isChange:#isChange#,vMemberID:'#vMemberID#',vMemberName:'#vMemberName#',vMemberStatus:Val(MemberStatus)", btn btn-default)
@@ -3368,13 +3368,13 @@ Divs:content-wrapper
                     Divs: clearfix
                         If(#isChange#==1)
                             Divs: pull-right
-                                BtnPage(members_list, "Back", "", btn btn-default btn-pill-left ml4)
-                                BtnContract(members_Change_Status,Change, Are you sure you want to change the status for #vMemberName#,"MemberId:Val(MemberID),PersonStatus:Val(MemberStatus),DateExpiration:Val(DateExpiration),isDateExpiration:Val(isDateExpiration)",'btn btn-success btn-pill-right',template,members_list)
+                                BtnPage(members_list, LangJS(back), "", btn btn-default btn-pill-left ml4)
+                                BtnContract(members_Change_Status,$change$, Are you sure you want to change the status for #vMemberName#,"MemberId:Val(MemberID),PersonStatus:Val(MemberStatus),DateExpiration:Val(DateExpiration),isDateExpiration:Val(isDateExpiration)",'btn btn-success btn-pill-right',template,members_list)
                             DivsEnd:
                         Else:
                             Divs: pull-right
-                                BtnPage(members_list, "Back", "", btn btn-default btn-pill-left ml4)
-                                BtnContract(members_Request_Accept,Accept, Accept requests from #vMemberName#,"RequestId:Val(MemberID),PersonStatus:Val(MemberStatus),RequestName:Val(MemberName),DateExpiration:Val(DateExpiration),isDateExpiration:Val(isDateExpiration)",'btn btn-success btn-pill-right',template,members_list)
+                                BtnPage(members_list, LangJS(back), "", btn btn-default btn-pill-left ml4)
+                                BtnContract(members_Request_Accept,$accept$, Accept requests from #vMemberName#,"RequestId:Val(MemberID),PersonStatus:Val(MemberStatus),RequestName:Val(MemberName),DateExpiration:Val(DateExpiration),isDateExpiration:Val(isDateExpiration)",'btn btn-success btn-pill-right',template,members_list)
                             DivsEnd:
                         IfEnd:
                     DivsEnd:
@@ -3983,7 +3983,7 @@ Divs:content-wrapper
                                 DivsEnd:
                                 Divs: row df f-valign
                             		Divs: col-md-5 mt-sm text-right
-                                    Div(h5 text-normal, "Member ID:")
+                                    Div(h5 text-normal, LangJS(member_id))
                                     DivsEnd:
                             		Divs: col-md-7 mt-sm text-left
                                     Div(h5 text-normal, Address(#citizen_id#))
@@ -4328,7 +4328,7 @@ Divs:content-wrapper
                             Divs(form-group)
                                 Label(LangJS(date_expiration))
                                 Divs(input-group)
-                                    Input(NotLimited, "form-control  m-b disabled=''", text, text, "Not limited")
+                                    Input(NotLimited, "form-control  m-b disabled=''", text, text, $not_limited$)
                                     Divs(input-group-btn)
                                         BtnPage(tokens_create, Em(fa fa-plus), "isDateExpiration:1,vTypeEmission:Val(TypeEmission),vRollbackTokens:Val(RollbackTokens),vAmount:Val(Amount)",  btn btn-default ml4)
                                     DivsEnd:
@@ -4430,7 +4430,7 @@ Divs(md-12, panel panel-primary data-sweet-alert)
                     [ Name,  Div(text-left text-bold #style#, #name_tokens#), h4 ],
                     [ Rollback tokens, Div(text-bold #style#, StateVal(tokens_rollback_tokens,#flag_rollback_tokens#) ), h4 ],
                     [ Date create,  Div(#style# text-center, DateTime(#date_create#, YYYY.MM.DD HH:MI) ), text-center h4 align="center" width="130" ],
-                    [ Expiration, If(#date_expiration#, Div(#style# text-center, DateTime(#date_expiration#, YYYY.MM.DD HH:MI)), Div(#style# text-center, Not limited)), text-center h4 align="center" width="130"],
+                    [ Expiration, If(#date_expiration#, Div(#style# text-center, DateTime(#date_expiration#, YYYY.MM.DD HH:MI)), Div(#style# text-center, LangJS(not_limited))), text-center h4 align="center" width="130"],
                     [ Status, If(#delete#==0, Div(text-bold text-center #style#, "Active") ,  Div(text-bold text-center #style#, "Closed") ), text-center h4 align="center" width="80" ],
                     [ Emission, Div(text-bold text-center #style#, If(#delete#==0, If(#type_emission#==2, BtnPage(tokens_emission, Em(fa fa-plus), "",  btn btn-success),StateVal(tokens_type_emission,#type_emission#)), StateVal(tokens_type_emission,#type_emission#)) ), text-center h4 align="center" width="130" ],
                     [ Amount,  Div(text-right text-bold #style#, Money(#amount#) ), text-center h4 align="center" width="130" ],
@@ -5447,7 +5447,7 @@ If(GetVar(vID))
                                     DivsEnd:
                                     Divs: row df f-valign
                                 		Divs: col-md-5 mt-sm text-right
-                                        Div(h5 text-normal, "Member ID:")
+                                        Div(h5 text-normal, LangJS(member_id))
                                         DivsEnd:
                                 		Divs: col-md-7 mt-sm text-left
                                         Div(h5 text-normal, Address(#citizen_id#))
@@ -6014,7 +6014,7 @@ SetVar(`pa_buildings_use_class #= Shops, Financial and professional services, Re
 `pac_buildings_use_class #= ContractConditions("MainCondition")`,
 `pa_land_use #= Agriculture, Forestry, Fishing, Mining and quarrying, Hunting, Energy production, Industry and manufacturing, Transport - communication networks - storage and protective works, Water and waste treatment, Construction, Commerce finance and business, Community services, Recreational - leisure - sport, Residential, Unused`,
 `pac_land_use #= ContractConditions("MainCondition")`,
-`pa_members_request_status #= Member,Visitor,Visitor (with SR)`,
+`pa_members_request_status #= $member$,$visitor$,$visitor_sr$`,
 `pac_members_request_status #= ContractConditions("MainCondition")`,
 `pa_notification_ClosureType #= Single,Multiple`,
 `pac_notification_ClosureType #= ContractConditions("MainCondition")`,

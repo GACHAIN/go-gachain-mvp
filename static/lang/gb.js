@@ -102,6 +102,11 @@ Lang = {
 	"status": "Status",
 	"citizen_word": "Citizen",
 	"account": "Account",
+	"members": "Members",
+	"view_all": "View all",
+	"change": "Change",
+	"not_limited": "Not limited",
+	"member_id": "Member ID",
 /** ================================================= */
 	"installation": "Installation",
 	"mode": "Mode",
