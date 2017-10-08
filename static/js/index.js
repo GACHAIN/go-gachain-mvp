@@ -1734,12 +1734,13 @@ function getMapAddressSquare(elem, coords) {
 	coords = coords.cords;
 
 	for (i = 0; i < coords.length; i++) {
-		area.push(new google.maps.LatLng(coords[i][0], coords[i][1]));
+		area.push(new BMap.Point(coords[i][0], coords[i][1]));
 	}
 
 	if (elem.val() === "" || elem.text() === "" || arraysEqual(coords, tempCoordsArea) === false) {
-		elem.val(google.maps.geometry.spherical.computeArea(area).toFixed(0));
-		elem.text(google.maps.geometry.spherical.computeArea(area).toFixed(0));
+		var value = GeoUtils.getPolygonArea(area);
+		elem.val(value);
+		elem.text(value);
 	}
 
 	tempCoordsArea = coords;
@@ -1751,7 +1752,7 @@ function arraysEqual(a, b) {
 
 function getMapGeocode(coords, callback) {
 	var latlng = {};
-	var geocoder = new google.maps.Geocoder;
+	var geocoder = new BMap.Geocoder();
 
 	latlng = { lat: parseFloat(coords.cords[0][0]), lng: parseFloat(coords.cords[0][1]) };
 
