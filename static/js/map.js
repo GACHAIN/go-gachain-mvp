@@ -2,6 +2,7 @@ function gob(e) { if (typeof (e) == 'object') return (e); if (document.getElemen
 var map;
 var polyShape;
 var markerShape;
+var miniMapNum = 0;
 //var oldDirMarkers = [];
 //var tmpPolyLine;
 var drawnShapes = [];
@@ -70,7 +71,6 @@ var polygonstyles = [];
 //var rectanglestyles = [];
 var circlestyles = [];
 var markerstyles = [];
-var geocoder; // = new google.maps.Geocoder();
 //var startLocation;
 var endLocation;
 //var dircount;
@@ -155,7 +155,7 @@ function circstyle() {
 }
 function markerstyleobject() {
     this.name = "markerstyle";
-    this.icon = "//maps.google.com/intl/en_us/mapfiles/ms/micons/red-dot.png";
+    this.icon = "static/img/map/red-dot.png";
 }
 function placemarkobject() {
     this.name = "NAME";
@@ -203,14 +203,14 @@ function preparePolyline() {
         strokeWeight: polylinestyles[lcur].width
     };
     polyShape = new BMap.Polyline(polyPoints, polyOptions);
-    polyShape.setMap(map);
+    map.addOverlay(polyShape);
     /*var tmpPolyOptions = {
     	strokeColor: polylinestyles[lcur].color,
     	strokeOpacity: polylinestyles[lcur].lineopac,
     	strokeWeight: polylinestyles[lcur].width
     };
     tmpPolyLine = new BMap.Polyline([], tmpPolyOptions);
-    tmpPolyLine.setMap(map);*/
+    map.addOverlay(tmpPolyLine);*/
 }
 
 function preparePolygon() {
@@ -222,7 +222,7 @@ function preparePolygon() {
         fillOpacity: polygonstyles[pcur].fillopac
     };
     polyShape = new BMap.Polygon(polyPoints, polyOptions);
-    polyShape.setMap(map);
+    map.addOverlay(polyShape);
 }
 function activateRectangle() {
     rectangle = new google.maps.Rectangle({
@@ -251,15 +251,13 @@ function activateMarker() {
     });
 }
 function initmap() {
-    geocoder = new google.maps.Geocoder();
     var latlng = new BMap.Point(StateCenterX, StateCenterY);//(45.0,7.0);//45.074723, 7.656433
     var mapTypeIds = [
-        BMap.MapType.BMAP_NORMAL_MAP,
-        BMap.MapType.BMAP_PERSPECTIVE_MAP,
-        BMap.MapType.BMAP_SATELLITE_MAP,
-        BMap.MapType.BMAP_HYBRID_MAP
+        BMAP_NORMAL_MAP,
+        BMAP_PERSPECTIVE_MAP,
+        BMAP_SATELLITE_MAP,
+        BMAP_HYBRID_MAP
     ];
-    mapTypeIds.push("OSM");
     copyrightNode = document.createElement('div');
     copyrightNode.id = 'copyright-control';
     copyrightNode.style.fontSize = '11px';
@@ -268,34 +266,24 @@ function initmap() {
     copyrightNode.style.whiteSpace = 'nowrap';
     //copyrightNode.index = 0;
     var myOptions = {
-        zoom: StateZoom,
-        center: latlng,
         draggableCursor: 'default',
         draggingCursor: 'pointer',
         scaleControl: true,
         mapTypeControl: true,
         mapTypeControlOptions: { mapTypeIds: mapTypeIds },
-        //mapTypeControlOptions:{style: BMap.MapTypeControlType.BMAP_MAPTYPE_CONTROL_DROPDOWN},
-        mapTypeId: BMap.MapType.BMAP_NORMAL_MAP,
+        //mapTypeControlOptions:{style: BMAP_MAPTYPE_CONTROL_DROPDOWN},
+        mapType: BMAP_NORMAL_MAP,
         styles: [{ featureType: 'poi', stylers: [{ visibility: 'off' }] }],
         streetViewControl: false
     };
-    map = new google.maps.Map(gob('map_canvas'), myOptions);
-    map.mapTypes.set("OSM", new google.maps.ImageMapType({
-        getTileUrl: function (coord, zoom) {
-            return "http://tile.openstreetmap.org/" + zoom + "/" + coord.x + "/" + coord.y + ".png";
-        },
-        tileSize: new BMap.Size(256, 256),
-        name: "OpenStreetMap",
-        maxZoom: 18
-    }));
+    map = new BMap.Map('map_canvas', myOptions);
+    map.centerAndZoom(latlng, StateZoom);
     map.addEventListener('maptypeid_changed', updateCopyrights);
-    map.controls[google.maps.ControlPosition.BOTTOM_RIGHT].push(copyrightNode);
 
     //var myStyle = [{featureType: 'poi', stylers: [{visibility: 'off'}]}];
     //map.setOptions({styles: myStyle}); // styles and stylers are arrays
     polyPoints = new google.maps.MVCArray(); // collects coordinates
-    tmpPolyLine.setMap(map);
+    map.addOverlay(tmpPolyLine);
     createplacemarkobject();
     createlinestyleobject();
     createpolygonstyleobject();
@@ -389,7 +377,7 @@ function createrectangle(point) {
     //startMarker.setAnimation(null);
     startMarker.setTitle("Draggable");
     startMarker.setOptions({ raiseOnDrag: false });
-    polyShape.setMap(null); // remove the Polyline that has collected the points
+    map.removeOverlay(polyShape); // remove the Polyline that has collected the points
     polyPoints = [];
     drawRectangle();
 }
@@ -448,7 +436,7 @@ function createcircle(point) {
     startMarker.setAnimation(null);
     startMarker.setTitle("Draggable");
     drawCircle();
-    polyShape.setMap(null); // remove the Polyline that has collected the points
+    map.removeOverlay(polyShape); // remove the Polyline that has collected the points
     polyPoints = [];
 }
 function drawCircle() {
@@ -476,8 +464,8 @@ function distance(lat1, lon1, lat2, lon2) {
 }
 
 function drawMarkers(point) {
-    if (startMarker) startMarker.setMap(null);
-    if (polyShape) polyShape.setMap(null);
+    if (startMarker) map.removeOverlay(startMarker);
+    if (polyShape) map.removeOverlay(polyShape);
     var id = plmcur;
     placemarks[plmcur].jscode = point.lat.toFixed(6) + ',' + point.lng.toFixed(6);
     placemarks[plmcur].kmlcode = point.lng.toFixed(6) + ',' + point.lat.toFixed(6);
@@ -493,7 +481,7 @@ function drawMarkers(point) {
         markerShape = marker;
         var html = "<b>" + placemarks[plmcur].name + "</b> <br/>" + placemarks[plmcur].desc;
         infowindow.setContent(html);
-        if (tinyMarker) tinyMarker.setMap(null);
+        if (tinyMarker) map.removeOverlay(tinyMarker);
         tinyMarker = new BMap.Marker(placemarks[plmcur].point, {
             map: map,
             icon: tinyIcon
@@ -564,7 +552,7 @@ function calcRoute(request) {
             strokeWeight: polylinestyles[lcur].width
         }
     });
-    if (firstdirclick == 1) directionsDisplay.setMap(map);
+    if (firstdirclick == 1) map.addOverlay(directionsDisplay);
     firstdirclick++;
 
     directionsService.route(request, RenderCustomDirections);
@@ -616,7 +604,7 @@ function RenderCustomDirections(response, status) {
     else alert(status);
 }
 function createdirMarker(latlng, html) {
-    if (tinyMarker) tinyMarker.setMap(null);
+    if (tinyMarker) map.removeOverlay(tinyMarker);
     createplacemarkobject();
     plmcur++; // plmcur = placemarks.length -1;
     activateMarker();
@@ -640,7 +628,7 @@ function createdirMarker(latlng, html) {
         //var htm = "<b>" + placemarks[thisshape].name + "</b> <br/>" + placemarks[thisshape].desc;
         if (polyPoints == 0) {
             //infowindow.setContent(htm);
-            if (tinyMarker) tinyMarker.setMap(null);
+            if (tinyMarker) map.removeOverlay(tinyMarker);
             tinyMarker = new BMap.Marker(placemarks[plmcur].point, {
                 map: map,
                 icon: tinyIcon
@@ -659,7 +647,7 @@ function createdirMarker(latlng, html) {
 // Called from deleteLastPoint() initiated by click on button
 function undo() {
     if (drawnShapes.length > 1) {
-        drawnShapes[drawnShapes.length - 1].setMap(null);
+        map.removeOverlay(drawnShapes[drawnShapes.length - 1]);
         destinations.pop();
         var point = destinations[destinations.length - 1];
         waypts.pop();
@@ -684,12 +672,12 @@ function undo() {
 
 // Not used
 function setDirectionsMarker(point) {
-    var image = new google.maps.MarkerImage('http://www.birdtheme.org/useful/images/square.png');
+    var image = new google.maps.MarkerImage('static/img/map/square.png');
     var marker = new BMap.Marker(point, {
         map: map,
         icon: image
     });
-    var shadow = new google.maps.MarkerImage('//maps.google.com/intl/en_us/mapfiles/ms/micons/msmarker.shadow.png',
+    var shadow = new google.maps.MarkerImage('static/img/map/msmarker.shadow.png',
         new BMap.Size(37, 32),
         new BMap.Point(16, 0),
         new BMap.Point(0, 32));
@@ -750,7 +738,7 @@ function setTool() {
             }*/
             placemarks[plmcur].style = polylinestyles[polylinestyles.length - 1].name;
             placemarks[plmcur].stylecur = polylinestyles.length - 1;
-            if (polyShape) polyShape.setMap(null);
+            if (polyShape) map.removeOverlay(polyShape);
             preparePolyline(); //if a polygon exists, it will be redrawn as polylines
             if (codeID == 1) logCode1(); // KML
             if (codeID == 2) logCode4(); // Javascipt
@@ -789,15 +777,15 @@ function setTool() {
             }*/
             placemarks[plmcur].style = polygonstyles[polygonstyles.length - 1].name;
             placemarks[plmcur].stylecur = polygonstyles.length - 1;
-            if (polyShape) polyShape.setMap(null);
+            if (polyShape) map.removeOverlay(polyShape);
             preparePolygon(); //if a polyline exists, it will be redrawn as a polygon
             if (codeID == 1) logCode2(); // KML
             if (codeID == 2) logCode4(); // Javascript
         }
         if (toolID == 3 || toolID == 4 || toolID == 5 || toolID == 6) {
-            if (polyShape) polyShape.setMap(null);
-            if (circle) circle.setMap(null);
-            if (rectangle) rectangle.setMap(null);
+            if (polyShape) map.removeOverlay(polyShape);
+            if (circle) map.removeOverlay(circle);
+            if (rectangle) map.removeOverlay(rectangle);
             directionsYes = 0;
             newstart();
         }
@@ -872,7 +860,7 @@ function nextshape() {
     //Set listener on current shape. Create new placemark object.
     //Increase counter for placemark
     increaseplmcur();
-    if (polyShape) drawnShapes.push(polyShape); // used in clearMap, to have it removed from the map, drawnShapes[i].setMap(null)
+    if (polyShape) drawnShapes.push(polyShape); // used in clearMap, to have it removed from the map, map.removeOverlay(drawnShapes[i]);
     if (outerShape) drawnShapes.push(outerShape);
     if (circle) drawnShapes.push(circle);
     if (rectangle) drawnShapes.push(rectangle);
@@ -891,8 +879,8 @@ function addpolyShapelistener() {
     // I can't do that in v3. Instead I put a listener on the shape
     if (toolID == 1 || toolID == 2) {
         polyShape.addEventListener('click', function (point) {
-            if (tinyMarker) tinyMarker.setMap(null);
-            if (startMarker) startMarker.setMap(null);
+            if (tinyMarker) map.removeOverlay(tinyMarker);
+            if (startMarker) map.removeOverlay(startMarker);
             directionsYes = 0;
             polyShape = placemarks[thisshape].shape;
             plmcur = thisshape;
@@ -957,9 +945,9 @@ function addpolyShapelistener() {
     if (toolID == 3) {
         rectangle.addEventListener('click', function (point) {
             gob('EditButton').disabled = 'disabled';
-            if (tinyMarker) tinyMarker.setMap(null);
-            if (startMarker) startMarker.setMap(null);
-            if (nemarker) nemarker.setMap(null);
+            if (tinyMarker) map.removeOverlay(tinyMarker);
+            if (startMarker) map.removeOverlay(startMarker);
+            if (nemarker) map.removeOverlay(nemarker);
             directionsYes = 0;
             rectangle = placemarks[thisshape].shape;
             plmcur = thisshape;
@@ -993,13 +981,13 @@ function addpolyShapelistener() {
 // Clear current Map
 function clearMap(full) {
     if (editing == true) stopediting();
-    if (polyShape) polyShape.setMap(null); // polyline or polygon
-    if (outerShape) outerShape.setMap(null);
-    if (rectangle) rectangle.setMap(null);
-    if (circle) circle.setMap(null);
+    if (polyShape) map.removeOverlay(polyShape); // polyline or polygon
+    if (outerShape) map.removeOverlay(outerShape);
+    if (rectangle) map.removeOverlay(rectangle);
+    if (circle) map.removeOverlay(circle);
     if (drawnShapes.length > 0) {
         for (var i = 0; i < drawnShapes.length; i++) {
-            drawnShapes[i].setMap(null);
+            map.removeOverlay(drawnShapes[i]);
         }
     }
     plmcur = 0;
@@ -1048,10 +1036,10 @@ function newstart(full) {
     closethis('polygonoptions');
     closethis('circleoptions');
     if (toolID != 2) closethis('polygonstuff');
-    if (directionsDisplay) directionsDisplay.setMap(null);
-    if (startMarker) startMarker.setMap(null);
-    if (nemarker) nemarker.setMap(null);
-    if (tinyMarker) tinyMarker.setMap(null);
+    if (directionsDisplay) map.removeOverlay(directionsDisplay);
+    if (startMarker) map.removeOverlay(startMarker);
+    if (nemarker) map.removeOverlay(nemarker);
+    if (tinyMarker) map.removeOverlay(tinyMarker);
     if (toolID == 1) {
         placemarks[plmcur].style = polylinestyles[polylinestyles.length - 1].name;
         placemarks[plmcur].stylecur = polylinestyles.length - 1;
@@ -1163,8 +1151,8 @@ function holecreator() {
             adder = 0;
             return;
         } else {
-            if (startMarker) startMarker.setMap(null);
-            if (polyShape) polyShape.setMap(null);
+            if (startMarker) map.removeOverlay(startMarker);
+            if (polyShape) map.removeOverlay(polyShape);
             polyPoints = [];
             preparePolyline();
             //gob('stepdiv').innerHTML = "Step 1";
@@ -1188,7 +1176,7 @@ function holecreator() {
         if (anotherhole == true) { // set to true in nexthole
             // a hole has been drawn, another is about to be drawn
             if (polyShape && polyPoints.length == 0) {
-                polyShape.setMap(null);
+                map.removeOverlay(polyShape);
                 /*gob('eGaaSCoords').value = 'Oops! Not programmed yet, but you may continue drawing holes. '+
                 'Everything you have created will show up when you click Hole again.';*/
             } else {
@@ -1203,12 +1191,12 @@ function holecreator() {
         }
         polyPoints = [];
         preparePolyline();
-        if (startMarker) startMarker.setMap(null);
+        if (startMarker) map.removeOverlay(startMarker);
     }
     if (holestep == 3) {
-        if (startMarker) startMarker.setMap(null);
-        if (outerShape) outerShape.setMap(null);
-        if (polyShape) polyShape.setMap(null);
+        if (startMarker) map.removeOverlay(startMarker);
+        if (outerShape) map.removeOverlay(outerShape);
+        if (polyShape) map.removeOverlay(polyShape);
         if (polyPoints.length > 0) holePolyArray.push(polyPoints);
         if (innerArray.length > 0) innerArrays.push(innerArray);
         if (innerArrayKml.length > 0) innerArraysKml.push(innerArrayKml);
@@ -1222,7 +1210,7 @@ function holecreator() {
 function drawpolywithhole() {
     if (holeShapes.length > 0) {
         for (var i = 0; i < holeShapes.length; i++) {
-            holeShapes[i].setMap(null);
+            map.removeOverlay(holeShapes[i]);
         }
     }
     var polyOptions = {
@@ -1233,11 +1221,11 @@ function drawpolywithhole() {
         fillOpacity: polygonstyles[pcur].fillopac
     };
     polyShape = new BMap.Polygon(holePolyArray, polyOptions);
-    polyShape.setMap(map);
+    map.addOverlay(polyShape);
     //Cursor position, when inside polyShape, is registered with this listener
     cursorposition(polyShape);
     anotherhole = false;
-    if (startMarker) startMarker.setMap(null);
+    if (startMarker) map.removeOverlay(startMarker);;
     startMarker = new BMap.Marker(outerPoints.getAt(0), {
         map: map
     });
@@ -1300,10 +1288,10 @@ function stopediting() {
         if (codeID == 2) logCode5(); // write Google javascript
     } else {
         for (var i = 0; i < markers.length; i++) {
-            markers[i].setMap(null);
+            map.removeOverlay(markers[i]);
         }
         for (var i = 0; i < midmarkers.length; i++) {
-            midmarkers[i].setMap(null);
+            map.removeOverlay(midmarkers[i]);
         }
         polyPoints = polyShape.getPath();
         markers = [];
@@ -1330,7 +1318,7 @@ function editlines() {
                 showthis('RegretButton');
                 toolID = gob('toolchoice').value = 1; // editing is set to be possible only in polyline draw mode
                 setTool();
-                if (startMarker) startMarker.setMap(null);
+                if (startMarker) map.removeOverlay(startMarker);
                 /*polyShape.setOptions({
                     editable: true
                 });*/
@@ -1352,10 +1340,10 @@ function editlines() {
 function regret() {
     if (polyPoints.length == 0) return;
     for (var i = 0; i < markers.length; i++) {
-        markers[i].setMap(null);
+        map.removeOverlay(markers[i]);
     }
     for (var i = 0; i < midmarkers.length; i++) {
-        midmarkers[i].setMap(null);
+        map.removeOverlay(midmarkers[i]);
     }
     polyPoints.insertAt(prevnumber, prevpoint);
     polyShape.setPath(polyPoints);
@@ -1399,7 +1387,7 @@ function setmarkers(point) {
             if (markers[i] == marker && markers.length != 1) {
                 prevpoint = marker.getPosition();
                 prevnumber = i;
-                marker.setMap(null);
+                map.removeOverlay(marker);
                 markers.splice(i, 1);
                 polyShape.getPath().removeAt(i);
                 removemidmarker(i);
@@ -1522,10 +1510,10 @@ function movemidmarker(index) {
 function removemidmarker(index) {
     if (markers.length > 0) {//clicked marker has already been deleted
         if (index != markers.length) {
-            midmarkers[index].setMap(null);
+            map.removeOverlay(midmarkers[index]);
             midmarkers.splice(index, 1);
         } else {
-            midmarkers[index - 1].setMap(null);
+            map.removeOverlay(midmarkers[index - 1]);
             midmarkers.splice(index - 1, 1);
         }
     }
@@ -1553,21 +1541,23 @@ function showKML() {
     gob('eGaaSCoords').value += kmlend();
 }
 function showAddress(address) {
-    geocoder.geocode({ 'address': address }, function (results, status) {
-        if (status == google.maps.GeocoderStatus.OK) {
-            var pos = results[0].geometry.location;
+    var encodedAddress = encodeURIComponent(address);
+    var url = 'http://api.map.baidu.com/geocoder/v2/?output=json&address=' + encodedAddress + '&ak=27c88c00210c334dcad9c787e132d3df';
+    $.get(url, function(result) {
+        if (result.status === 0) {
+            var pos = new BMap.Point(result.result.location.lng, result.result.location.lat);
             map.setCenter(pos);
             tinyMarker = new BMap.Marker(pos, {
-                map: map,
                 icon: tinyIcon
             });
+            map.addOverlay(tinyMarker);
             drawnShapes.push(tinyMarker);
             if (directionsYes == 1) drawDirections(pos);
             if (toolID == 5) drawMarkers(pos);
         } else {
-            alert("Geocode was not successful for the following reason: " + status);
+            alert(result.msg);
         }
-    });
+    }, 'jsonp');
 }
 function activateDirections() {
     directionsYes = 1;
@@ -1822,7 +1812,7 @@ function polylinestyle(e) { //save style
         placemarks[plmcur].stylecur = lcur;
     }
     gob("stylenumberl").innerHTML = (lcur + 1) + ' ';
-    if (polyShape) polyShape.setMap(null);
+    if (polyShape) map.removeOverlay(polyShape);
     preparePolyline();
     if (directionsYes == 1) {
         toolID = 6;
@@ -1867,8 +1857,8 @@ function polygonstyle(e) {
     placemarks[plmcur].style = polygonstyles[pcur].name;
     placemarks[plmcur].stylecur = pcur;
     gob("stylenumberp").innerHTML = (pcur + 1) + ' ';
-    if (polyShape) polyShape.setMap(null);
-    if (outerShape) outerShape.setMap(null);
+    if (polyShape) map.removeOverlay(polyShape);
+    if (outerShape) map.removeOverlay(outerShape);
     if (holePolyArray.length > 0) {
         drawpolywithhole();
         if (codeID == 1) logCode3();
@@ -1909,7 +1899,7 @@ function circlestyle(e) {
     placemarks[plmcur].style = circlestyles[ccur].name;
     placemarks[plmcur].stylecur = ccur;
     gob("stylenumberc").innerHTML = (ccur + 1) + ' ';
-    if (circle) circle.setMap(null);
+    if (circle) map.removeOverlay(circle);
     activateCircle();
     if (radiusPoint) {
         drawCircle();
@@ -1979,7 +1969,7 @@ function stepstyles(a) {
             placemarks[plmcur].style = polylinestyles[lcur].name;
             placemarks[plmcur].stylecur = lcur;
         }
-        if (polyShape) polyShape.setMap(null);
+        if (polyShape) map.removeOverlay(polyShape);
         preparePolyline();
         if (directionsYes == 1) {
             toolID = 6;
@@ -2012,7 +2002,7 @@ function stepstyles(a) {
         placemarks[plmcur].stylecur = pcur;
         if (polyShape) {
             //alert("polyShape");
-            polyShape.setMap(null);
+            map.removeOverlay(polyShape);
             preparePolygon();
             if (polyPoints.length) {
                 if (codeID == 1) logCode2();
@@ -2021,7 +2011,7 @@ function stepstyles(a) {
         }
         /*if(rectangle) {
             //alert("polyShape");
-            rectangle.setMap(null);
+            map.removeOverlay(rectangle);
             activateRectangle();
             if(polyPoints.length) {
                 if(codeID == 1) logCode2();
@@ -2046,7 +2036,7 @@ function stepstyles(a) {
         }
         placemarks[plmcur].style = circlestyles[ccur].name;
         placemarks[plmcur].stylecur = ccur;
-        if (circle) circle.setMap(null);
+        if (circle) map.removeOverlay(circle);
         activateCircle();
         if (radiusPoint) {
             logCode7();
@@ -2254,7 +2244,7 @@ function logCode4() {
             + '}\n';
         gob('eGaaSCoords').value += options;
         gob('eGaaSCoords').value += 'var it = new BMap.Polyline(myCoordinates, polyOptions);\n'
-            + 'it.setMap(map);\n';
+            + 'map.addOverlay(it);\n';
         placemarks[plmcur].poly = "pl";
     }
     if (toolID == 2) {
@@ -2268,7 +2258,7 @@ function logCode4() {
         +'}\n';
         gob('eGaaSCoords').value += options;
         gob('eGaaSCoords').value +='var it = new BMap.Polygon(myCoordinates, polyOptions);\n'
-        +'it.setMap(map);\n';
+        +'map.addOverlay(it);\n';
         placemarks[plmcur].poly = "pg";*/
     }
     javacode = gob('eGaaSCoords').value;
@@ -2309,7 +2299,7 @@ function logCode5() {
         + 'fillOpacity: ' + polygonstyles[pcur].fillopac + '\n'
         + '};\n'
         + 'var it = new BMap.Polygon(myCoordinates, polyOptions);\n'
-        + 'it.setMap(map);\n';
+        + 'map.addOverlay(it);\n';
     placemarks[plmcur].poly = "pgh";
     javacode = gob('eGaaSCoords').value;
 }
@@ -2345,7 +2335,7 @@ function logCode6() {
             + '}\n';
         gob('eGaaSCoords').value += options;
         gob('eGaaSCoords').value += 'var it = new BMap.Polyline(myCoopolyOptions, polyOptions);\n'
-            + 'it.setMap(map);\n';
+            + 'map.addOverlay(it);\n';
         javacode = gob('eGaaSCoords').value;
     }
     if (codeID == 1) { // kml
@@ -2452,11 +2442,10 @@ function regMap(coords, render) {
         }
 
         if (render != false) {
-            var map = new google.maps.Map(document.getElementById('map_canvas'), {
-                zoom: StateZoom,
-                center: { lat: StateCenterX, lng: StateCenterY },
-                mapTypeId: BMap.MapType.BMAP_PERSPECTIVE_MAP
+            var map = new BMap.Map('map_canvas', {
+                mapType: BMAP_PERSPECTIVE_MAP
             });
+            map.centerAndZoom({ lat: StateCenterX, lng: StateCenterY }, StateZoom);
 
             var State = new BMap.Polygon(StateCoords, {
                 strokeColor: '#FF0000',
@@ -2465,7 +2454,7 @@ function regMap(coords, render) {
                 fillColor: '#0000FF',
                 fillOpacity: 0.6
             });
-            State.setMap(map);
+            map.addOverlay(State);
         }
     } else {
         container.hide();
@@ -2539,8 +2528,6 @@ function saveMap() {
 	}, 0)
 }
 
-var miniMapNum = 0;
-
 function miniMap(elem, width, height) {
     $("." + elem).css({ "font-size": "0px" });
 
@@ -2552,10 +2539,7 @@ function miniMap(elem, width, height) {
         var miniCenterY = 0;
         var miniZoom = 0;
         var latlng = {};
-        var mapType = $(this).attr('maptype');
-        if (!mapType) {
-            mapType = 'terrain';
-        }
+        var mapType = getMapType($(this).attr('maptype'));
         var mapHeight = $(this).attr('hmap');
         if (mapHeight)
             mapHeight += 'px';
@@ -2566,7 +2550,7 @@ function miniMap(elem, width, height) {
                 $(this).addClass("panel");
             }
 
-            miniMapNum += 1;
+            ++miniMapNum;
             data = JSON.parse($(this).text());
             miniPoints = data.cords;
             miniZoom = Number(data.zoom);
@@ -2586,11 +2570,10 @@ function miniMap(elem, width, height) {
             canvas.style.margin = "0px auto";
             this.appendChild(canvas);
 
-            var map = new google.maps.Map(document.getElementById("miniMap_" + miniMapNum), {
-                zoom: miniZoom,
-                center: { lat: miniCenterX, lng: miniCenterY },
-                mapTypeId: mapType
+            var map = new BMap.Map(canvas, {
+                mapType: mapType
             });
+            map.centerAndZoom({ lat: miniCenterX, lng: miniCenterY }, miniZoom);
 
             var mini = new BMap.Polygon(miniCoords, {
                 strokeColor: '#FF0000',
@@ -2599,9 +2582,22 @@ function miniMap(elem, width, height) {
                 fillColor: '#0000FF',
                 fillOpacity: 0.6
             });
-            mini.setMap(map);
+            map.addOverlay(mini);
         }
     });
+}
+
+function getMapType(maptype) {
+    if (typeof maptype !== 'string') {
+        return BMAP_NORMAL_MAP;
+    }
+    switch (maptype.toLowerCase()) {
+        case 'roadmap': return BMAP_NORMAL_MAP;
+        case 'satellite': return BMAP_SATELLITE_MAP;
+        case 'hybrid': return BMAP_HYBRID_MAP;
+        case 'terrain': return BMAP_PERSPECTIVE_MAP;
+        default: return BMAP_NORMAL_MAP;
+    }
 }
 
 function userLocation(elem, width, height) {
@@ -2621,10 +2617,7 @@ function userLocation(elem, width, height) {
         var canvas = document.createElement('div');
         var textarea;
         var id = "userLocation_" + num;
-        var mapType = $(this).attr('maptype');
-        if (!mapType) {
-            mapType = 'terrain';
-        }
+        var mapType = getMapType($(this).attr('maptype'));
         var mapHeight = $(this).attr('hmap');
         if (mapHeight)
             mapHeight += 'px';
@@ -2653,11 +2646,10 @@ function userLocation(elem, width, height) {
             container.appendChild(canvas);
         }
 
-        var map = new google.maps.Map(document.getElementById(id), {
-            zoom: zoom,
-            center: center,
-            mapTypeId: mapType
+        var map = new BMap.Map(canvas, {
+            mapType: mapType
         });
+        map.centerAndZoom(center, zoom);
 
         var marker = new BMap.Marker(point, {
             map: map,
@@ -2702,7 +2694,7 @@ function userLocation(elem, width, height) {
 
             map.setZoom(zoom);
             map.setCenter(center);
-            marker.setMap(map);
+            map.addOverlay(marker);
         }
     });
 }
