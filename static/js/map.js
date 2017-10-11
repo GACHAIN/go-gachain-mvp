@@ -77,8 +77,6 @@ var endLocation;
 var dircountstart;
 var firstdirclick = 0;
 var dirmarknum = 1;
-var directionsDisplay;
-var directionsService = new google.maps.DirectionsService();
 var directionsYes = 0;
 var destinations = [];
 var removedirectionleg = 0;
@@ -86,47 +84,45 @@ var removedirectionleg = 0;
 //var oldpoint = null;
 var prevpoint;
 var prevnumber;
-var infowindow = new google.maps.InfoWindow();//({size: new BMap.Size(150,50)});
+var directionsService = null;
+var infoWindow = new BMap.InfoWindow('', {
+    width: 150,
+    height: 50
+});
 var tmpPolyLine = new BMap.Polyline([], {
     strokeColor: "#00FF00",
     strokeOpacity: 0.8,
     strokeWeight: 2
 });
-var tinyIcon = new google.maps.MarkerImage(
+var tinyIcon = new BMap.Icon(
     'static/img/marker_red.png',
     new BMap.Size(12, 20),
-    new BMap.Point(0, 0),
-    new BMap.Point(6, 16)
+    {}
 );
-/*var tinyShadow = new google.maps.MarkerImage(
+/*var tinyShadow = new BMap.Icon(
     'icons/marker_20_shadow.png',
     new BMap.Size(22,20),
-    new BMap.Point(6,20),
-    new BMap.Point(5,1)
+    {}
 );*/
-var imageNormal = new google.maps.MarkerImage(
+var imageNormal = new BMap.Icon(
     "images/square.png",
     new BMap.Size(11, 11),
-    new BMap.Point(0, 0),
-    new BMap.Point(6, 6)
+    {}
 );
-var imageHover = new google.maps.MarkerImage(
+var imageHover = new BMap.Icon(
     "images/square_over.png",
     new BMap.Size(11, 11),
-    new BMap.Point(0, 0),
-    new BMap.Point(6, 6)
+    {}
 );
-var imageNormalMidpoint = new google.maps.MarkerImage(
+var imageNormalMidpoint = new BMap.Icon(
     "images/square_transparent.png",
     new BMap.Size(11, 11),
-    new BMap.Point(0, 0),
-    new BMap.Point(6, 6)
+    {}
 );
-/*var imageHoverMidpoint = new google.maps.MarkerImage(
+/*var imageHoverMidpoint = new BMap.Icon(
 	"square_transparent_over.png",
 	new BMap.Size(11, 11),
-	new BMap.Point(0, 0),
-	new BMap.Point(6, 6)
+	{}
 );*/
 function polystyle() {
     this.name = "Lump";
@@ -226,7 +222,6 @@ function preparePolygon() {
 }
 function activateRectangle() {
     rectangle = new google.maps.Rectangle({
-        map: map,
         strokeColor: polygonstyles[pcur].color,
         strokeOpacity: polygonstyles[pcur].lineopac,
         strokeWeight: polygonstyles[pcur].width,
@@ -236,7 +231,6 @@ function activateRectangle() {
 }
 function activateCircle() {
     circle = new BMap.Circle(new BMap.Point(0, 0), 0, {
-        map: map,
         fillColor: circlestyles[ccur].fill,
         fillOpacity: circlestyles[ccur].fillopac,
         strokeColor: circlestyles[ccur].color,
@@ -246,12 +240,11 @@ function activateCircle() {
 }
 function activateMarker() {
     markerShape = new BMap.Marker(new BMap.Point(0, 0), {
-        map: map,
         icon: markerstyles[mcur].icon
     });
 }
 function initmap() {
-    var latlng = new BMap.Point(StateCenterX, StateCenterY);//(45.0,7.0);//45.074723, 7.656433
+    var latlng = new BMap.Point(StateCenterY, StateCenterX);//(45.0,7.0);//45.074723, 7.656433
     var mapTypeIds = [
         BMAP_NORMAL_MAP,
         BMAP_PERSPECTIVE_MAP,
@@ -358,9 +351,7 @@ function addLatLng(point) {
     }
 }
 function setstartMarker(point) {
-    startMarker = new BMap.Marker(point, {
-        map: map
-    });
+    startMarker = new BMap.Marker(point, {});
     startMarker.setTitle("#" + polyPoints.length);
 }
 function createrectangle(point) {
@@ -368,8 +359,7 @@ function createrectangle(point) {
     nemarker = new BMap.Marker(point.latLng, {
         draggable: true,
         raiseOnDrag: false,
-        title: "Draggable",
-        map: map
+        title: "Draggable"
     });
     startMarker.addEventListener('dragend', drawRectangle);
     nemarker.addEventListener('dragend', drawRectangle);
@@ -393,8 +383,8 @@ function drawRectangle() {
     //Cursor position, when inside rectangle, is registered with this listener
     cursorposition(rectangle);
     // the Rectangle was created in activateRectangle(), called from newstart(), which may have been called from setTool()
-    var northWest = new BMap.Point(southWest.lat, northEast.lng);
-    var southEast = new BMap.Point(northEast.lat, southWest.lng);
+    var northWest = new BMap.Point(northEast.lng, southWest.lat);
+    var southEast = new BMap.Point(southWest.lng, northEast.lat);
     polyPoints = [];
     pointsArray = [];
     pointsArrayKml = [];
@@ -427,8 +417,7 @@ function createcircle(point) {
     nemarker = new BMap.Marker(point.latLng, {
         draggable: true,
         raiseOnDrag: false,
-        title: "Draggable",
-        map: map
+        title: "Draggable"
     });
     startMarker.addEventListener('drag', drawCircle);
     nemarker.addEventListener('drag', drawCircle);
@@ -473,23 +462,21 @@ function drawMarkers(point) {
     markerShape.setPosition(point);
     var marker = markerShape;
     tinyMarker = new BMap.Marker(placemarks[plmcur].point, {
-        map: map,
         icon: tinyIcon
     });
     marker.addEventListener('click', function (event) {
         plmcur = id;
         markerShape = marker;
         var html = "<b>" + placemarks[plmcur].name + "</b> <br/>" + placemarks[plmcur].desc;
-        infowindow.setContent(html);
+        infoWindow.setContent(html);
         if (tinyMarker) map.removeOverlay(tinyMarker);
         tinyMarker = new BMap.Marker(placemarks[plmcur].point, {
-            map: map,
             icon: tinyIcon
         });
         if (toolID != 5) toolID = gob('toolchoice').value = 5;
         if (codeID == 1) logCode9();
         if (codeID == 2) logCode8();
-        infowindow.open(map, marker);
+        map.openInfoWindow(infoWindow, point);
     });
     drawnShapes.push(markerShape);
     if (codeID == 2) logCode8();
@@ -502,7 +489,7 @@ function drawDirections(point) {
             origin: dirpointstart,
             destination: point,
             waypoints: waypts,
-            travelMode: google.maps.DirectionsTravelMode.DRIVING
+            travelMode: BMAP_ROUTE_TYPE_DRIVING
         };
         //oldpoint = point;
         waypts.push({ location: point, stopover: true });
@@ -513,7 +500,7 @@ function drawDirections(point) {
         request = {
             origin: dirpointstart,
             destination: point,
-            travelMode: google.maps.DirectionsTravelMode.DRIVING
+            travelMode: BMAP_ROUTE_TYPE_DRIVING
         };
         //oldpoint = point;
         waypts.push({ location: point, stopover: true });
@@ -527,14 +514,10 @@ function drawDirections(point) {
         dirline = plmcur;
         placemarks[dirline].shape = polyShape; // created in preparePolyline(), initiated in newstart() called from setTool()
         placemarks[dirline].point = dirpointstart;
-        directionsDisplay = new google.maps.DirectionsRenderer({
-            suppressMarkers: true,
-            preserveViewport: true
-        });
         request = {
             origin: dirpointstart,
             destination: point,
-            travelMode: google.maps.DirectionsTravelMode.DRIVING
+            travelMode: BMAP_ROUTE_TYPE_DRIVING
         };
         //destinations.push(request.destination);
         calcRoute(request);
@@ -545,24 +528,22 @@ function drawDirections(point) {
 }
 //}
 function calcRoute(request) {
-    directionsDisplay.setOptions({
-        polylineOptions: {
-            strokeColor: polylinestyles[lcur].color,
-            strokeOpacity: polylinestyles[lcur].lineopac,
-            strokeWeight: polylinestyles[lcur].width
-        }
-    });
-    if (firstdirclick == 1) map.addOverlay(directionsDisplay);
     firstdirclick++;
-
-    directionsService.route(request, RenderCustomDirections);
+    if (directionsService === null) {
+        directionsService = new BMap.DrivingRoute(map, {
+            onSearchComplete: function(result) { console.log(result); },
+            renderOptions: {
+                map: map
+            }
+        });
+    }
+    directionsService.search(request.origin, request.destination, {});
 }
-function RenderCustomDirections(response, status) {
-    if (status == google.maps.DirectionsStatus.OK) {
+function RenderCustomDirections(response) {
+    if (getNumPlans() > 0) {
         //var m = step + 1;
         //if(removedirectionleg == 1) m = m - 1;
-        directionsDisplay.setDirections(response);
-        var result = directionsDisplay.getDirections().routes[0];
+        var result = response.routes[0];
         var legs = response.routes[0].legs;
         polyPoints = [];
         pointsArray = [];
@@ -601,7 +582,7 @@ function RenderCustomDirections(response, status) {
         docudetails();
         //showthis('toppers');
     }
-    else alert(status);
+    else alert('No directions found');
 }
 function createdirMarker(latlng, html) {
     if (tinyMarker) map.removeOverlay(tinyMarker);
@@ -627,10 +608,9 @@ function createdirMarker(latlng, html) {
         plmcur = thisshape;
         //var htm = "<b>" + placemarks[thisshape].name + "</b> <br/>" + placemarks[thisshape].desc;
         if (polyPoints == 0) {
-            //infowindow.setContent(htm);
+            //infoWindow.setContent(htm);
             if (tinyMarker) map.removeOverlay(tinyMarker);
             tinyMarker = new BMap.Marker(placemarks[plmcur].point, {
-                map: map,
                 icon: tinyIcon
             });
             if (toolID != 5) {
@@ -639,7 +619,7 @@ function createdirMarker(latlng, html) {
             }
             if (codeID == 1) logCode9();
             if (codeID == 2) logCode8();
-            //infowindow.open(map,marker);
+            //map.openInfoWindow(infoWindow, latlng);
         }
     });
     drawnShapes.push(markerShape);
@@ -655,7 +635,7 @@ function undo() {
             origin: dirpointstart,
             destination: point,
             waypoints: waypts,
-            travelMode: google.maps.DirectionsTravelMode.DRIVING
+            travelMode: BMAP_ROUTE_TYPE_DRIVING
         };
         placemarks.pop();
         markersArray.pop();
@@ -672,21 +652,20 @@ function undo() {
 
 // Not used
 function setDirectionsMarker(point) {
-    var image = new google.maps.MarkerImage('static/img/map/square.png');
+    var image = new BMap.Icon('static/img/map/square.png',
+        new BMap.Size(12, 12),
+        {});
     var marker = new BMap.Marker(point, {
-        map: map,
         icon: image
     });
-    var shadow = new google.maps.MarkerImage('static/img/map/msmarker.shadow.png',
+    var shadow = new BMap.Icon('static/img/map/msmarker.shadow.png',
         new BMap.Size(37, 32),
-        new BMap.Point(16, 0),
-        new BMap.Point(0, 32));
+        {});
     var title = "#" + markers.length;
     var id = plmcur;
     placemarks[plmcur].point = point;
     placemarks[plmcur].coord = point.lng.toFixed(6) + ', ' + point.lat.toFixed(6);
     /*var marker = new BMap.Marker(point, {
-        map: map,
         draggable: true,
         icon: image,
         shadow: shadow});*/
@@ -936,7 +915,6 @@ function addpolyShapelistener() {
                 if (codeID == 2) logCode5(); // write Google javascript
             }
             tinyMarker = new BMap.Marker(placemarks[plmcur].point, {
-                map: map,
                 icon: tinyIcon
             });
             closethis('polygonstuff');
@@ -961,14 +939,12 @@ function addpolyShapelistener() {
             startMarker = new BMap.Marker(southwest, {
                 draggable: true,
                 raiseOnDrag: false,
-                title: "Draggable",
-                map: map
+                title: "Draggable"
             });
             nemarker = new BMap.Marker(northeast, {
                 draggable: true,
                 raiseOnDrag: false,
-                title: "Draggable",
-                map: map
+                title: "Draggable"
             });
             startMarker.addEventListener('dragend', drawRectangle);
             nemarker.addEventListener('dragend', drawRectangle);
@@ -1036,7 +1012,6 @@ function newstart(full) {
     closethis('polygonoptions');
     closethis('circleoptions');
     if (toolID != 2) closethis('polygonstuff');
-    if (directionsDisplay) map.removeOverlay(directionsDisplay);
     if (startMarker) map.removeOverlay(startMarker);
     if (nemarker) map.removeOverlay(nemarker);
     if (tinyMarker) map.removeOverlay(tinyMarker);
@@ -1226,9 +1201,7 @@ function drawpolywithhole() {
     cursorposition(polyShape);
     anotherhole = false;
     if (startMarker) map.removeOverlay(startMarker);;
-    startMarker = new BMap.Marker(outerPoints.getAt(0), {
-        map: map
-    });
+    startMarker = new BMap.Marker(outerPoints.getAt(0), {});
     startMarker.setTitle("Polygon with hole");
     placemarks[plmcur].point = outerPoints.getAt(0);
 }
@@ -1354,7 +1327,6 @@ function regret() {
 // Called from editlines and listener set in setmidmarkers
 function setmarkers(point) {
     var marker = new BMap.Marker(point, {
-        map: map,
         icon: imageNormal,
         raiseOnDrag: false,
         draggable: true
@@ -1407,11 +1379,10 @@ function setmarkers(point) {
 function setmidmarkers(point, prevpoint) {
     //var prevpoint = markers[markers.length-2].getPosition();
     var position = new BMap.Point(
-        point.lat - (0.5 * (point.lat - prevpoint.lat)),
-        point.lng - (0.5 * (point.lng - prevpoint.lng))
+        point.lng - (0.5 * (point.lng - prevpoint.lng)),
+        point.lat - (0.5 * (point.lat - prevpoint.lat))
     );
     var marker = new BMap.Marker(position, {
-        map: map,
         icon: imageNormalMidpoint,
         raiseOnDrag: false,
         draggable: true
@@ -1447,13 +1418,13 @@ function setmidmarkers(point, prevpoint) {
                 var newpos = marker.getPosition();
                 var startMarkerPos = markers[i].getPosition();
                 var firstVPos = new BMap.Point(
-                    newpos.lat - (0.5 * (newpos.lat - startMarkerPos.lat)),
-                    newpos.lng - (0.5 * (newpos.lng - startMarkerPos.lng))
+                    newpos.lng - (0.5 * (newpos.lng - startMarkerPos.lng)),
+                    newpos.lat - (0.5 * (newpos.lat - startMarkerPos.lat))
                 );
                 var endMarkerPos = markers[i + 1].getPosition();
                 var secondVPos = new BMap.Point(
-                    newpos.lat - (0.5 * (newpos.lat - endMarkerPos.lat)),
-                    newpos.lng - (0.5 * (newpos.lng - endMarkerPos.lng))
+                    newpos.lng - (0.5 * (newpos.lng - endMarkerPos.lng)),
+                    newpos.lat - (0.5 * (newpos.lat - endMarkerPos.lat))
                 );
                 var newVMarker = setmidmarkers(secondVPos, startMarkerPos);
                 newVMarker.setPosition(secondVPos);//apply the correct position to the midmarker
@@ -1490,16 +1461,16 @@ function movemidmarker(index) {
     if (index != 0) {
         var prevpos = markers[index - 1].getPosition();
         midmarkers[index - 1].setPosition(new BMap.Point(
-            newpos.lat - (0.5 * (newpos.lat - prevpos.lat)),
-            newpos.lng - (0.5 * (newpos.lng - prevpos.lng))
+            newpos.lng - (0.5 * (newpos.lng - prevpos.lng)),
+            newpos.lat - (0.5 * (newpos.lat - prevpos.lat))
         ));
         //prevpos = null;
     }
     if (index != markers.length - 1) {
         var nextpos = markers[index + 1].getPosition();
         midmarkers[index].setPosition(new BMap.Point(
-            newpos.lat - (0.5 * (newpos.lat - nextpos.lat)),
-            newpos.lng - (0.5 * (newpos.lng - nextpos.lng))
+            newpos.lng - (0.5 * (newpos.lng - nextpos.lng)),
+            newpos.lat - (0.5 * (newpos.lat - nextpos.lat))
         ));
         //nextpos = null;
     }
@@ -1521,8 +1492,8 @@ function removemidmarker(index) {
         var prevpos = markers[index - 1].getPosition();
         var newpos = markers[index].getPosition();
         midmarkers[index - 1].setPosition(new BMap.Point(
-            newpos.lat - (0.5 * (newpos.lat - prevpos.lat)),
-            newpos.lng - (0.5 * (newpos.lng - prevpos.lng))
+            newpos.lng - (0.5 * (newpos.lng - nextpos.lng)),
+            newpos.lat - (0.5 * (newpos.lat - prevpos.lat))
         ));
         //prevpos = null;
         //newpos = null;
@@ -1644,7 +1615,7 @@ function mapzoom() {
 }
 function mapcenter() {
     var mapCenter = map.getCenter();
-    var wrapped = new BMap.Point(mapCenter.lat, mapCenter.lng);
+    var wrapped = new BMap.Point(mapCenter.lng, mapCenter.lat);
     var latLngStr = '"' + wrapped.lat.toFixed(6) + '","' + wrapped.lng.toFixed(6) + '"';
     //var latLngStr = mapCenter.lat.toFixed(6) + ', ' + mapCenter.lng.toFixed(6);
     gob("centerofmap").value = latLngStr;
@@ -2309,15 +2280,14 @@ function logCode6() {
     //placemarks[plmcur].style = polygonstyles[pcur].name;
     if (codeID == 2) { // javascript
         gob('eGaaSCoords').value = 'var rectangle = new google.maps.Rectangle({\n'
-            + 'map: map,\n'
             + 'fillColor: ' + polygonstyles[pcur].fill + ',\n'
             + 'fillOpacity: ' + polygonstyles[pcur].fillopac + ',\n'
             + 'strokeColor: ' + polygonstyles[pcur].color + ',\n'
             + 'strokeOpacity: ' + polygonstyles[pcur].lineopac + ',\n'
             + 'strokeWeight: ' + polygonstyles[pcur].width + '\n'
             + '});\n';
-        gob('eGaaSCoords').value += 'var sWest = new BMap.Point(' + southWest.lat.toFixed(6) + ',' + southWest.lng.toFixed(6) + ');\n'
-            + 'var nEast = new BMap.Point(' + northEast.lat.toFixed(6) + ',' + northEast.lng.toFixed(6) + ');\n'
+        gob('eGaaSCoords').value += 'var sWest = new BMap.Point(' + southWest.lng.toFixed(6) + ',' + southWest.lat.toFixed(6) + ');\n'
+            + 'var nEast = new BMap.Point(' + northEast.lng.toFixed(6) + ',' + northEast.lat.toFixed(6) + ');\n'
             + 'var bounds = new google.maps.LatLngBounds(sWest,nEast);\n'
             + 'rectangle.setBounds(bounds);\n';
         gob('eGaaSCoords').value += '\n\\\\ Code for polyline rectangle\n';
@@ -2358,8 +2328,7 @@ function logCode6() {
 function logCode7() { // javascript for circle
     if (notext === true) return;
     //placemarks[plmcur].style = circlestyles[ccur].name;
-    gob('eGaaSCoords').value = 'var circle = new BMap.Circle(new BMap.Point(' + centerPoint.lat.toFixed(6) + ',' + centerPoint.lng.toFixed(6) + '), 0, {\n'
-        + 'map: map,\n'
+    gob('eGaaSCoords').value = 'var circle = new BMap.Circle(new BMap.Point(' + centerPoint.lng.toFixed(6) + ',' + centerPoint.lat.toFixed(6) + '), 0, {\n'
         + 'fillColor: ' + circlestyles[ccur].fill + ',\n'
         + 'fillOpacity: ' + circlestyles[ccur].fillopac + ',\n'
         + 'strokeColor: ' + circlestyles[ccur].color + ',\n'
@@ -2373,7 +2342,6 @@ function logCode8() { //javascript for Marker
     if (notext === true) return;
     var text = 'var image = \'' + markerstyles[mcur].icon + '\';\n'
         + 'var marker = new BMap.Marker(' + placemarks[plmcur].point + ', {\n'
-        + 'map: map, //global variable \'map\' from opening function\n'
         + 'icon: image\n'
         + '});\n'
         + '//Your content for the infowindow\n'
@@ -2445,7 +2413,7 @@ function regMap(coords, render) {
             var map = new BMap.Map('map_canvas', {
                 mapType: BMAP_PERSPECTIVE_MAP
             });
-            map.centerAndZoom({ lat: StateCenterX, lng: StateCenterY }, StateZoom);
+            map.centerAndZoom(new BMap.Point(StateCenterY, StateCenterX), StateZoom);
 
             var State = new BMap.Polygon(StateCoords, {
                 strokeColor: '#FF0000',
@@ -2564,16 +2532,17 @@ function miniMap(elem, width, height) {
 
             $(this).text("");
             var canvas = document.createElement('div');
-            canvas.setAttribute("id", "miniMap_" + miniMapNum);
+            var id = 'miniMap_' + miniMapNum;
+            canvas.setAttribute('id', id);
             canvas.style.width = width;
             canvas.style.height = mapHeight;
             canvas.style.margin = "0px auto";
             this.appendChild(canvas);
 
-            var map = new BMap.Map(canvas, {
+            var map = new BMap.Map(id, {
                 mapType: mapType
             });
-            map.centerAndZoom({ lat: miniCenterX, lng: miniCenterY }, miniZoom);
+            map.centerAndZoom(new BMap.Point(miniCenterY, miniCenterX), miniZoom);
 
             var mini = new BMap.Polygon(miniCoords, {
                 strokeColor: '#FF0000',
@@ -2610,7 +2579,7 @@ function userLocation(elem, width, height) {
         var tag = $(this).context.tagName.toLowerCase();
         var data = $(this).text() ? $(this).text() : $(this).val();
         var zoom = 5;
-        var center = { lat: 23.907173, lng: 54.333531 };
+        var center = new BMap.Point(54.333531, 23.907173);
         var point = null;
         var options = {};
         var draggable = true;
@@ -2646,17 +2615,13 @@ function userLocation(elem, width, height) {
             container.appendChild(canvas);
         }
 
-        var map = new BMap.Map(canvas, {
-            mapType: mapType
-        });
+        options.mapType = mapType;
+        var map = new BMap.Map(id, options);
         map.centerAndZoom(center, zoom);
 
         var marker = new BMap.Marker(point, {
-            map: map,
             draggable: draggable
         });
-
-        map.setOptions(options);
 
         map.addListener('drag', function () {
             if (point != null && tag === "textarea") {
