@@ -221,7 +221,7 @@ function preparePolygon() {
     map.addOverlay(polyShape);
 }
 function activateRectangle() {
-    rectangle = new google.maps.Rectangle({
+    rectangle = new BMap.Polygon([], {
         strokeColor: polygonstyles[pcur].color,
         strokeOpacity: polygonstyles[pcur].lineopac,
         strokeWeight: polygonstyles[pcur].width,
@@ -271,11 +271,14 @@ function initmap() {
     };
     map = new BMap.Map('map_canvas', myOptions);
     map.centerAndZoom(latlng, StateZoom);
+    map.addControl(new BMap.NavigationControl());
+    map.addControl(new BMap.ScaleControl());
+    map.addControl(new BMap.OverviewMapControl());
+    map.addControl(new BMap.MapTypeControl());
     map.addEventListener('maptypeid_changed', updateCopyrights);
 
     //var myStyle = [{featureType: 'poi', stylers: [{visibility: 'off'}]}];
     //map.setOptions({styles: myStyle}); // styles and stylers are arrays
-    polyPoints = new google.maps.MVCArray(); // collects coordinates
     map.addOverlay(tmpPolyLine);
     createplacemarkobject();
     createlinestyleobject();
@@ -316,7 +319,7 @@ function addLatLng(point) {
     // Rectangle and circle can't collect points with getPath. solved by letting Polyline collect the points and then erase Polyline
     polyPoints = polyShape.getPath();
     // This codeline does the drawing on the map
-    polyPoints.insertAt(polyPoints.length, point.latLng); // or: polyPoints.push(point.latLng)
+    polyPoints.push(point.latLng);
     if (polyPoints.length == 1) {
         startpoint = point.latLng;
         placemarks[plmcur].point = startpoint; // stored because it's to be used when the shape is clicked on as a stored shape
@@ -371,15 +374,25 @@ function createrectangle(point) {
     polyPoints = [];
     drawRectangle();
 }
+function setRectangleBounds(rectangle, bounds) {
+    var sw = bounds.getSouthWest();
+    var ne = bounds.getNorthEast();
+    rectangle.setPath([
+        new BMap.Point(ne.lng, sw.lat),
+        ne,
+        new BMap.Point(sw.lng, ne.lat),
+        sw
+    ]);
+}
 function drawRectangle() {
     gob('EditButton').disabled = 'disabled';
     southWest = startMarker.getPosition(); // used in logCode6()
     northEast = nemarker.getPosition(); // used in logCode6()
-    var latLngBounds = new google.maps.LatLngBounds(
+    var latLngBounds = new BMap.Bounds(
         southWest,
         northEast
     );
-    rectangle.setBounds(latLngBounds);
+    setRectangleBounds(rectangle, latLngBounds);
     //Cursor position, when inside rectangle, is registered with this listener
     cursorposition(rectangle);
     // the Rectangle was created in activateRectangle(), called from newstart(), which may have been called from setTool()
@@ -1079,7 +1092,7 @@ function deleteLastPoint() {
         if (polyShape) {
             polyPoints = polyShape.getPath();
             if (polyPoints.length > 0) {
-                polyPoints.removeAt(polyPoints.length - 1);
+                polyPoints.splice(polyPoints.length - 1, 1);
                 pointsArrayKml.pop();
                 pointsArray.pop();
                 if (codeID == 1) logCode1();
@@ -1091,18 +1104,18 @@ function deleteLastPoint() {
         if (innerArrayKml.length > 0) {
             innerArrayKml.pop();
             innerArray.pop();
-            polyPoints.removeAt(polyPoints.length - 1);
+            polyPoints.splice(polyPoints.length - 1, 1);
         }
         if (outerArrayKml.length > 0 && innerArrayKml.length == 0) {
             outerArrayKml.pop();
             outerArray.pop();
-            //polyPoints.removeAt(polyPoints.length-1);
+            //polyPoints.splice(polyPoints.length - 1, 1);
         }
         if (outerPoints.length === 0) {
             if (polyShape) {
                 polyPoints = polyShape.getPath();
                 if (polyPoints.length > 0) {
-                    polyPoints.removeAt(polyPoints.length - 1);
+                    polyPoints.splice(polyPoints.length - 1, 1);
                     pointsArrayKml.pop();
                     pointsArray.pop();
                     if (adder == 0) {
@@ -1140,7 +1153,7 @@ function holecreator() {
         // innerArray and innerArrayKml will be collected in function addLatLng
         if (anotherhole == false) {
             // outer line is finished, in Polyline draw mode
-            polyPoints.insertAt(polyPoints.length, startpoint); // let start and end for outer line meet
+            polyPoints.push(startpoint); // let start and end for outer line meet
             outerPoints = polyPoints; // store polyPoints in outerPoints. polyPoints will be reused for inner lines
             holePolyArray.push(outerPoints); // this will be the points array for polygon with hole when the points for inner lines are added
             outerShape = polyShape; // store polyShape in outerShape. polyShape will be reused for inner lines
@@ -1155,7 +1168,7 @@ function holecreator() {
                 /*gob('eGaaSCoords').value = 'Oops! Not programmed yet, but you may continue drawing holes. '+
                 'Everything you have created will show up when you click Hole again.';*/
             } else {
-                polyPoints.insertAt(polyPoints.length, startpoint);
+                polyPoints.push(startpoint);
                 holePolyArray.push(polyPoints);
                 if (innerArray.length > 0) innerArrays.push(innerArray);
                 if (innerArrayKml.length > 0) innerArraysKml.push(innerArrayKml);
@@ -1274,7 +1287,7 @@ function stopediting() {
             drawnShapes.push(polyShape);
             addpolyShapelistener();
         }
-        //setstartMarker(polyPoints.getAt(0));
+        //setstartMarker(polyPoints[0]);
     }
 }
 // the "Edit lines" button has been pressed
@@ -1296,11 +1309,11 @@ function editlines() {
                     editable: true
                 });*/
                 for (var i = 0; i < polyPoints.length; i++) {
-                    var marker = setmarkers(polyPoints.getAt(i));
+                    var marker = setmarkers(polyPoints[i]);
                     markers.push(marker);
                     if (i > 0) {
-                        var previous = polyPoints.getAt(i - 1);
-                        var midmarker = setmidmarkers(polyPoints.getAt(i), previous);
+                        var previous = polyPoints[i - 1];
+                        var midmarker = setmidmarkers(polyPoints[i], previous);
                         midmarkers.push(midmarker);
                     }
                 }
@@ -1318,7 +1331,7 @@ function regret() {
     for (var i = 0; i < midmarkers.length; i++) {
         map.removeOverlay(midmarkers[i]);
     }
-    polyPoints.insertAt(prevnumber, prevpoint);
+    polyPoints.splice(prevnumber, 0, prevpoint);
     polyShape.setPath(polyPoints);
     //editing = false;
     stopediting();
@@ -2279,7 +2292,7 @@ function logCode6() {
     if (notext === true) return;
     //placemarks[plmcur].style = polygonstyles[pcur].name;
     if (codeID == 2) { // javascript
-        gob('eGaaSCoords').value = 'var rectangle = new google.maps.Rectangle({\n'
+        gob('eGaaSCoords').value = 'var rectangle = new BMap.Polygon([], {\n'
             + 'fillColor: ' + polygonstyles[pcur].fill + ',\n'
             + 'fillOpacity: ' + polygonstyles[pcur].fillopac + ',\n'
             + 'strokeColor: ' + polygonstyles[pcur].color + ',\n'
@@ -2288,8 +2301,8 @@ function logCode6() {
             + '});\n';
         gob('eGaaSCoords').value += 'var sWest = new BMap.Point(' + southWest.lng.toFixed(6) + ',' + southWest.lat.toFixed(6) + ');\n'
             + 'var nEast = new BMap.Point(' + northEast.lng.toFixed(6) + ',' + northEast.lat.toFixed(6) + ');\n'
-            + 'var bounds = new google.maps.LatLngBounds(sWest,nEast);\n'
-            + 'rectangle.setBounds(bounds);\n';
+            + 'var bounds = new BMap.Bounds(sWest,nEast);\n'
+            + 'setRectangleBounds(rectangle, bounds);;\n';
         gob('eGaaSCoords').value += '\n\\\\ Code for polyline rectangle\n';
         gob('eGaaSCoords').value += 'var myCoordinates = [\n';
         gob('eGaaSCoords').value += southWest.lat.toFixed(6) + ',' + southWest.lng.toFixed(6) + ',\n' +
@@ -2414,7 +2427,6 @@ function regMap(coords, render) {
                 mapType: BMAP_PERSPECTIVE_MAP
             });
             map.centerAndZoom(new BMap.Point(StateCenterY, StateCenterX), StateZoom);
-
             var State = new BMap.Polygon(StateCoords, {
                 strokeColor: '#FF0000',
                 strokeOpacity: 0.8,
@@ -2543,7 +2555,6 @@ function miniMap(elem, width, height) {
                 mapType: mapType
             });
             map.centerAndZoom(new BMap.Point(miniCenterY, miniCenterX), miniZoom);
-
             var mini = new BMap.Polygon(miniCoords, {
                 strokeColor: '#FF0000',
                 strokeOpacity: 0.8,
