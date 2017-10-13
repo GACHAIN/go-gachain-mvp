@@ -293,9 +293,9 @@ function initmap() {
 }
 // Called by initmap, addLatLng, drawRectangle, drawCircle, drawpolywithhole
 function cursorposition(mapregion) {
-    mapregion.addEventListener('mousemove', function (point) {
-        var LnglatStr6 = point.latLng.lng.toFixed(6) + ', ' + point.latLng.lat.toFixed(6);
-        var latLngStr6 = point.latLng.lat.toFixed(6) + ', ' + point.latLng.lng.toFixed(6);
+    mapregion.addEventListener('mousemove', function (e) {
+        var LnglatStr6 = e.point.lng.toFixed(6) + ', ' + e.point.lat.toFixed(6);
+        var latLngStr6 = e.point.lat.toFixed(6) + ', ' + e.point.lng.toFixed(6);
         gob('over').options[0].text = LnglatStr6;
         gob('over').options[1].text = latLngStr6;
     });
@@ -307,9 +307,9 @@ function updateCopyrights() {
         copyrightNode.innerHTML = "";
     }
 }
-function addLatLng(point) {
+function addLatLng(e) {
     if (directionsYes == 1) {
-        drawDirections(point.latLng);
+        drawDirections(e.point);
         return;
     }
     if (plmcur != placemarks.length - 1) {
@@ -319,20 +319,20 @@ function addLatLng(point) {
     // Rectangle and circle can't collect points with getPath. solved by letting Polyline collect the points and then erase Polyline
     polyPoints = polyShape.getPath();
     // This codeline does the drawing on the map
-    polyPoints.push(point.latLng);
+    polyPoints.push(e.point);
     if (polyPoints.length == 1) {
-        startpoint = point.latLng;
+        startpoint = e.point;
         placemarks[plmcur].point = startpoint; // stored because it's to be used when the shape is clicked on as a stored shape
         setstartMarker(startpoint);
         if (toolID == 5) {
             drawMarkers(startpoint);
         }
     }
-    if (polyPoints.length == 2 && toolID == 3) createrectangle(point);
-    if (polyPoints.length == 2 && toolID == 4) createcircle(point);
+    if (polyPoints.length == 2 && toolID == 3) createrectangle(e.point);
+    if (polyPoints.length == 2 && toolID == 4) createcircle(e.point);
     if (toolID == 1 || toolID == 2) { // if polyline or polygon
-        var stringtobesaved = '"' + point.latLng.lat.toFixed(6) + '","' + point.latLng.lng.toFixed(6) + '"';
-        var kmlstringtobesaved = '"' + point.latLng.lng.toFixed(6) + '","' + point.latLng.lat.toFixed(6) + '"';
+        var stringtobesaved = '"' + e.point.lat.toFixed(6) + '","' + e.point.lng.toFixed(6) + '"';
+        var kmlstringtobesaved = '"' + e.point.lng.toFixed(6) + '","' + e.point.lat.toFixed(6) + '"';
         //Cursor position, when inside polyShape, is registered with this listener
         cursorposition(polyShape);
         if (adder == 0) { //shape with no hole
@@ -357,9 +357,9 @@ function setstartMarker(point) {
     startMarker = new BMap.Marker(point, {});
     startMarker.setTitle("#" + polyPoints.length);
 }
-function createrectangle(point) {
+function createrectangle(e) {
     // startMarker is southwest point. now set northeast
-    nemarker = new BMap.Marker(point.latLng, {
+    nemarker = new BMap.Marker(e.point, {
         draggable: true,
         raiseOnDrag: false,
         title: "Draggable"
@@ -425,9 +425,9 @@ function drawRectangle() {
     if (codeID == 2) logCode6();
     if (codeID == 1) logCode2();
 }
-function createcircle(point) {
+function createcircle(e) {
     // startMarker is center point. now set radius
-    nemarker = new BMap.Marker(point.latLng, {
+    nemarker = new BMap.Marker(e.point, {
         draggable: true,
         raiseOnDrag: false,
         title: "Draggable"
@@ -579,11 +579,11 @@ function RenderCustomDirections(response) {
             //placemarks[plmcur].name = "Marker "+dirmarknum;
         }
         if (step > 0 && removedirectionleg == 0) {
-            endLocation.latlng = legs[step - 1].end_location;
+            endLocation.point = legs[step - 1].end_location;
             endLocation.address = legs[step - 1].end_address;
-            createdirMarker(endLocation.latlng, endLocation.address);
-            markersArray.push(endLocation.latlng.lat.toFixed(6) + ',' + endLocation.latlng.lng.toFixed(6));
-            markersArrayKml.push(endLocation.latlng.lng.toFixed(6) + ',' + endLocation.latlng.lat.toFixed(6));
+            createdirMarker(endLocation.point, endLocation.address);
+            markersArray.push(endLocation.point.lat.toFixed(6) + ',' + endLocation.point.lng.toFixed(6));
+            markersArrayKml.push(endLocation.point.lng.toFixed(6) + ',' + endLocation.point.lat.toFixed(6));
             addresssArray.push(endLocation.address);
             //placemarks[plmcur].name = "Marker "+dirmarknum;
         }
@@ -2654,7 +2654,7 @@ function userLocation(elem, width, height) {
 
         map.addListener('click', function (e) {
             if (tag === "textarea") {
-                point = e.latLng;
+                point = e.point;
                 marker.setPosition(point);
                 textarea.innerHTML = '{"center_point":["' + map.getCenter().lat + '","' + map.getCenter().lng + '"], "zoom":"' + map.getZoom() + '", "cords":["' + marker.getPosition().lat + '","' + marker.getPosition().lng + '"]}';
             }
