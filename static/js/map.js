@@ -354,8 +354,10 @@ function addLatLng(e) {
     }
 }
 function setstartMarker(point) {
-    startMarker = new BMap.Marker(point, {});
-    startMarker.setTitle("#" + polyPoints.length);
+    startMarker = new BMap.Marker(point, {
+        title: '#' + polyPoints.length
+    });
+    map.addOverlay(startMarker);
 }
 function createrectangle(e) {
     // startMarker is southwest point. now set northeast
@@ -371,6 +373,7 @@ function createrectangle(e) {
     startMarker.setTitle("Draggable");
     startMarker.setOptions({ raiseOnDrag: false });
     map.removeOverlay(polyShape); // remove the Polyline that has collected the points
+    map.addOverlay(nemarker);
     polyPoints = [];
     drawRectangle();
 }
@@ -897,24 +900,24 @@ function addpolyShapelistener() {
                 outerArrayKml = placemarks[plmcur].kmlcode;
                 innerArraysKml = placemarks[plmcur].kmlholecode;
                 /*var polly = polyShape.getPaths();
-                polyPoints = polly.getAt(0);
-                var points = polly.getAt(0);
+                polyPoints = polly[0];
+                var points = polly[0];
                 //alert(point.lng.toFixed(6));
                 for(var i = 0; i<points.length-1; i++) {
-                    outerArray.push(points.getAt(i).lat.toFixed(6) + ',' + points.getAt(i).lng.toFixed(6));
-                    outerArrayKml.push(points.getAt(i).lng.toFixed(6) + ',' + points.getAt(i).lat.toFixed(6));
+                    outerArray.push(points[i].lat.toFixed(6) + ',' + points[i].lng.toFixed(6));
+                    outerArrayKml.push(points[i].lng.toFixed(6) + ',' + points[i].lat.toFixed(6));
                 }
                 for(i = 1; i<polly.length; i++) {
-                    points = polly.getAt(i);
+                    points = polly[i];
                     if(i == polly.length-1) {
                         for(var j = 0; j<points.length; j++) {
-                            innerArray.push(points.getAt(j).lat.toFixed(6) + ',' + points.getAt(j).lng.toFixed(6));
-                            innerArrayKml.push(points.getAt(j).lng.toFixed(6) + ',' + points.getAt(j).lat.toFixed(6));
+                            innerArray.push(points[j].lat.toFixed(6) + ',' + points[j].lng.toFixed(6));
+                            innerArrayKml.push(points[j].lng.toFixed(6) + ',' + points[j].lat.toFixed(6));
                         }
                     }else{
                         for(var j = 0; j<points.length-1; j++) {
-                            innerArray.push(points.getAt(j).lat.toFixed(6) + ',' + points.getAt(j).lng.toFixed(6));
-                            innerArrayKml.push(points.getAt(j).lng.toFixed(6) + ',' + points.getAt(j).lat.toFixed(6));
+                            innerArray.push(points[j].lat.toFixed(6) + ',' + points[j].lng.toFixed(6));
+                            innerArrayKml.push(points[j].lng.toFixed(6) + ',' + points[j].lat.toFixed(6));
                         }
                     }
                     innerArrays.push(innerArray);
@@ -954,11 +957,13 @@ function addpolyShapelistener() {
                 raiseOnDrag: false,
                 title: "Draggable"
             });
+            map.addOverlay(startMarker);
             nemarker = new BMap.Marker(northeast, {
                 draggable: true,
                 raiseOnDrag: false,
                 title: "Draggable"
             });
+            map.addOverlay(nemarker);
             startMarker.addEventListener('dragend', drawRectangle);
             nemarker.addEventListener('dragend', drawRectangle);
             if (codeID == 1) logCode2();
@@ -1214,9 +1219,10 @@ function drawpolywithhole() {
     cursorposition(polyShape);
     anotherhole = false;
     if (startMarker) map.removeOverlay(startMarker);;
-    startMarker = new BMap.Marker(outerPoints.getAt(0), {});
+    startMarker = new BMap.Marker(outerPoints[0], {});
     startMarker.setTitle("Polygon with hole");
-    placemarks[plmcur].point = outerPoints.getAt(0);
+    map.addOverlay(startMarker);
+    placemarks[plmcur].point = outerPoints[0];
 }
 // Called from button 'Next hole' in div 'polygonstuff'
 function nexthole() {
@@ -1242,24 +1248,24 @@ function stopediting() {
         innerArrayKml = [];
         innerArraysKml = [];
         var polly = polyShape.getPaths();
-        polyPoints = polly.getAt(0);
-        var points = polly.getAt(0);
+        polyPoints = polly[0];
+        var points = polly[0];
         //alert(point.lng.toFixed(6));
         for (var i = 0; i < points.length - 1; i++) {
-            outerArray.push(points.getAt(i).lat.toFixed(6) + ',' + points.getAt(i).lng.toFixed(6));
-            outerArrayKml.push(points.getAt(i).lng.toFixed(6) + ',' + points.getAt(i).lat.toFixed(6));
+            outerArray.push(point[i].lat.toFixed(6) + ',' + points[i].lng.toFixed(6));
+            outerArrayKml.push(points[i].lng.toFixed(6) + ',' + points[i].lat.toFixed(6));
         }
         for (i = 1; i < polly.length; i++) {
-            points = polly.getAt(i);
+            points = polly[i];
             if (i == polly.length - 1) {
                 for (var j = 0; j < points.length; j++) {
-                    innerArray.push(points.getAt(j).lat.toFixed(6) + ',' + points.getAt(j).lng.toFixed(6));
-                    innerArrayKml.push(points.getAt(j).lng.toFixed(6) + ',' + points.getAt(j).lat.toFixed(6));
+                    innerArray.push(points[j].lat.toFixed(6) + ',' + points[j].lng.toFixed(6));
+                    innerArrayKml.push(points[j].lng.toFixed(6) + ',' + points[j].lat.toFixed(6));
                 }
             } else {
                 for (var j = 0; j < points.length - 1; j++) {
-                    innerArray.push(points.getAt(j).lat.toFixed(6) + ',' + points.getAt(j).lng.toFixed(6));
-                    innerArrayKml.push(points.getAt(j).lng.toFixed(6) + ',' + points.getAt(j).lat.toFixed(6));
+                    innerArray.push(points[j].lat.toFixed(6) + ',' + points[j].lng.toFixed(6));
+                    innerArrayKml.push(points[j].lng.toFixed(6) + ',' + points[j].lat.toFixed(6));
                 }
             }
             innerArrays.push(innerArray);
@@ -1374,7 +1380,7 @@ function setmarkers(point) {
                 prevnumber = i;
                 map.removeOverlay(marker);
                 markers.splice(i, 1);
-                polyShape.getPath().removeAt(i);
+                polyShape.getPath().splice(i, 1);
                 removemidmarker(i);
                 break;
             }
@@ -1443,12 +1449,12 @@ function setmidmarkers(point, prevpoint) {
                 newVMarker.setPosition(secondVPos);//apply the correct position to the midmarker
                 var newMarker = setmarkers(newpos);
                 markers.splice(i + 1, 0, newMarker);
-                polyShape.getPath().insertAt(i + 1, newpos);
+                polyShape.splice(i + 1, 0, newpos);
                 marker.setPosition(firstVPos);
                 midmarkers.splice(i + 1, 0, newVMarker);
-                tmpPolyLine.getPath().removeAt(2);
-                tmpPolyLine.getPath().removeAt(1);
-                tmpPolyLine.getPath().removeAt(0);
+                tmpPolyLine.getPath().splice(2, 1);
+                tmpPolyLine.getPath().splice(1, 1);
+                tmpPolyLine.getPath().splice(1, 1);
     			/*newpos = null;
     			startMarkerPos = null;
     			firstVPos = null;
@@ -2418,13 +2424,13 @@ function regMap(coords, render) {
         StateCenterY = Number(coords.center_point[1]);
 
         for (var i in StatePoints) {
-            latlng = { lat: Number(StatePoints[i][0]), lng: Number(StatePoints[i][1]) };
+            latlng = { lat: Number(StatePoints[i][1]), lng: Number(StatePoints[i][0]) };
             StateCoords.push(latlng);
         }
 
         if (render != false) {
             var map = new BMap.Map('map_canvas', {
-                mapType: BMAP_PERSPECTIVE_MAP
+                mapType: BMAP_NORMAL_MAP
             });
             map.centerAndZoom(new BMap.Point(StateCenterY, StateCenterX), StateZoom);
             var State = new BMap.Polygon(StateCoords, {
@@ -2538,7 +2544,7 @@ function miniMap(elem, width, height) {
             miniCenterY = Number(data.center_point[1]);
 
             for (var i in miniPoints) {
-                latlng = { lat: Number(miniPoints[i][0]), lng: Number(miniPoints[i][1]) };
+                latlng = { lat: Number(miniPoints[i][1]), lng: Number(miniPoints[i][0]) };
                 miniCoords.push(latlng);
             }
 
@@ -2629,7 +2635,6 @@ function userLocation(elem, width, height) {
         options.mapType = mapType;
         var map = new BMap.Map(id, options);
         map.centerAndZoom(center, zoom);
-
         var marker = new BMap.Marker(point, {
             draggable: draggable
         });
@@ -2663,8 +2668,8 @@ function userLocation(elem, width, height) {
         if (data) {
             data = JSON.parse(data);
             zoom = Number(data.zoom);
-            center = { lat: Number(data.center_point[0]), lng: Number(data.center_point[1]) };
-            point = { lat: Number(data.cords[0]), lng: Number(data.cords[1]) };
+            center = { lat: Number(data.center_point[1]), lng: Number(data.center_point[0]) };
+            point = { lat: Number(data.cords[1]), lng: Number(data.cords[0]) };
 
             marker.setPosition(point);
 
