@@ -270,11 +270,13 @@ function initmap() {
         streetViewControl: false
     };
     map = new BMap.Map('map_canvas', myOptions);
+    map.enableScrollWheelZoom();
     map.centerAndZoom(latlng, StateZoom);
     map.addControl(new BMap.NavigationControl());
     map.addControl(new BMap.ScaleControl());
     map.addControl(new BMap.OverviewMapControl());
     map.addControl(new BMap.MapTypeControl());
+    map.addControl(new BMap.GeolocationControl());
     map.addEventListener('maptypeid_changed', updateCopyrights);
 
     //var myStyle = [{featureType: 'poi', stylers: [{visibility: 'off'}]}];
@@ -318,8 +320,9 @@ function addLatLng(e) {
 
     // Rectangle and circle can't collect points with getPath. solved by letting Polyline collect the points and then erase Polyline
     polyPoints = polyShape.getPath();
-    // This codeline does the drawing on the map
     polyPoints.push(e.point);
+    // This codeline does the drawing on the map
+    polyShape.setPath(polyPoints);
     if (polyPoints.length == 1) {
         startpoint = e.point;
         placemarks[plmcur].point = startpoint; // stored because it's to be used when the shape is clicked on as a stored shape
@@ -1098,6 +1101,7 @@ function deleteLastPoint() {
             polyPoints = polyShape.getPath();
             if (polyPoints.length > 0) {
                 polyPoints.splice(polyPoints.length - 1, 1);
+                polyShape.setPath(polyPoints);
                 pointsArrayKml.pop();
                 pointsArray.pop();
                 if (codeID == 1) logCode1();
@@ -1121,6 +1125,7 @@ function deleteLastPoint() {
                 polyPoints = polyShape.getPath();
                 if (polyPoints.length > 0) {
                     polyPoints.splice(polyPoints.length - 1, 1);
+                    polyShape.setPath(polyPoints);
                     pointsArrayKml.pop();
                     pointsArray.pop();
                     if (adder == 0) {
@@ -1546,6 +1551,20 @@ function showAddress(address) {
             if (toolID == 5) drawMarkers(pos);
         } else {
             alert(result.msg);
+        }
+    }, 'jsonp');
+}
+function getMapGeocode(coords, callback) {
+    var lat = coords.cords[0][0];
+    var lng = coords.cords[0][1];
+    var url = 'http://api.map.baidu.com/geocoder/v2/?location=' + lat + ',' + lng + '&output=json&ak=27c88c00210c334dcad9c787e132d3df';
+    $.get(url, function(response) {
+        if (response.status === 0) {
+            if (response.result.formatted_address) {
+                callback(response.result.formatted_address);
+            }
+        } else {
+            alert(response.msg);
         }
     }, 'jsonp');
 }
@@ -2424,7 +2443,7 @@ function regMap(coords, render) {
         StateCenterY = Number(coords.center_point[1]);
 
         for (var i in StatePoints) {
-            latlng = { lat: Number(StatePoints[i][1]), lng: Number(StatePoints[i][0]) };
+            latlng = { lat: Number(StatePoints[i][0]), lng: Number(StatePoints[i][1]) };
             StateCoords.push(latlng);
         }
 
@@ -2432,6 +2451,7 @@ function regMap(coords, render) {
             var map = new BMap.Map('map_canvas', {
                 mapType: BMAP_NORMAL_MAP
             });
+            map.enableScrollWheelZoom();
             map.centerAndZoom(new BMap.Point(StateCenterY, StateCenterX), StateZoom);
             var State = new BMap.Polygon(StateCoords, {
                 strokeColor: '#FF0000',
@@ -2457,37 +2477,35 @@ function openMap(container, address, area) {
 	newAddressContainer = address ? address : container + "_address";
 	newAreaContainer = area ? area : container + "_area";
 	
-    $("#dl_modal").load("content?controllerHTML=modal_map", {}, function () {
-        var modal = $("#modal_map");
-        updateLanguage("#dl_modal .lang");
+    var modal = $("#modal_map");
+    updateLanguage("#modal_map .lang");
 
-        if (!newCoordsContainer.val() == "") {
-            try {
-                regMap(newCoordsContainer.val(), false);
-            } catch (e) {
-                Alert(e.name, e.message, "error");
-                return false;
-            }
-
-            modal.modal("show");
-            modal.on('shown.bs.modal', function (e) {
-                initmap();
-                clearMap();
-                $("#toolchoice, #codechoice").change();
-            })
-        } else {
-            StateZoom = 7;
-            StateCenterX = 23.907173;
-            StateCenterY = 54.333531;
-
-            modal.modal("show");
-            modal.on('shown.bs.modal', function (e) {
-                initmap();
-                clearMap();
-                $("#toolchoice, #codechoice").change();
-            })
+    if (!newCoordsContainer.val() == "") {
+        try {
+            regMap(newCoordsContainer.val(), false);
+        } catch (e) {
+            Alert(e.name, e.message, "error");
+            return false;
         }
-    });
+
+        modal.modal("show");
+        modal.on('shown.bs.modal', function (e) {
+            initmap();
+            clearMap();
+            $("#toolchoice, #codechoice").change();
+        });
+    } else {
+        StateZoom = 7;
+        StateCenterX = 23.907173;
+        StateCenterY = 54.333531;
+
+        modal.modal("show");
+        modal.on('shown.bs.modal', function (e) {
+            initmap();
+            clearMap();
+            $("#toolchoice, #codechoice").change();
+        });
+    }
 }
 
 function saveMap() {
@@ -2544,7 +2562,7 @@ function miniMap(elem, width, height) {
             miniCenterY = Number(data.center_point[1]);
 
             for (var i in miniPoints) {
-                latlng = { lat: Number(miniPoints[i][1]), lng: Number(miniPoints[i][0]) };
+                latlng = { lat: Number(miniPoints[i][0]), lng: Number(miniPoints[i][1]) };
                 miniCoords.push(latlng);
             }
 
@@ -2560,6 +2578,7 @@ function miniMap(elem, width, height) {
             var map = new BMap.Map(id, {
                 mapType: mapType
             });
+            map.enableScrollWheelZoom();
             map.centerAndZoom(new BMap.Point(miniCenterY, miniCenterX), miniZoom);
             var mini = new BMap.Polygon(miniCoords, {
                 strokeColor: '#FF0000',
@@ -2634,6 +2653,7 @@ function userLocation(elem, width, height) {
 
         options.mapType = mapType;
         var map = new BMap.Map(id, options);
+        map.enableScrollWheelZoom();
         map.centerAndZoom(center, zoom);
         var marker = new BMap.Marker(point, {
             draggable: draggable
@@ -2668,8 +2688,8 @@ function userLocation(elem, width, height) {
         if (data) {
             data = JSON.parse(data);
             zoom = Number(data.zoom);
-            center = { lat: Number(data.center_point[1]), lng: Number(data.center_point[0]) };
-            point = { lat: Number(data.cords[1]), lng: Number(data.cords[0]) };
+            center = { lat: Number(data.center_point[0]), lng: Number(data.center_point[1]) };
+            point = { lat: Number(data.cords[0]), lng: Number(data.cords[1]) };
 
             marker.setPosition(point);
 
