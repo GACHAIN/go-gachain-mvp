@@ -333,7 +333,7 @@ function sendnet{{.Unique}}() {
 			</div>
 			<!--<div class="clearfix">
 				<div class="pull-left">-->
-					<button type="button" class="btn btn-primary" onClick="openImageEditor('img{{.Name}}{{$.Unique}}', '{{.Name}}{{$.Unique}}', '1/1', '100', '100');"><i class="fa fa-file-image-o"></i> &nbsp;Add/Edit Image</button>
+					<button type="button" class="btn btn-primary" onClick="openImageEditor('img{{.Name}}{{$.Unique}}', '{{.Name}}{{$.Unique}}', '1/1', '100', '100');"><i class="fa fa-file-image-o"></i><span class="lang" lang-id="add_edit_image"></span></button>
 				<!--</div>
 			</div>-->
 			{{end}} {{end}}
@@ -343,7 +343,7 @@ function sendnet{{.Unique}}() {
 <div class="panel-footer">
 	<div class="clearfix">
 		<div class="pull-right">
-			<button id="send{{.Unique}}" type="button" class="btn btn-primary" data-tool="panel-refresh" onClick="preloader(this);">Send</button>
+			<button id="send{{.Unique}}" type="button" class="btn btn-primary lang" data-tool="panel-refresh" onClick="preloader(this);" lang-id="send"></button>
 		</div>
 	</div>
 </div>

@@ -3017,7 +3017,7 @@ UList(breadcrumb, ol)
 UListEnd:
 PageTitle: LangJS(editing_property)
 
-ValueById(#state_id#_property, #PropertyId#, "name,citizen_id,coords,type,police_inspection", "$name$,$citizen_id$,$coords$,$property_type$,$police_inspection$")
+ValueById(#state_id#_property, #PropertyId#, "name,citizen_id,coords,type,police_inspection", "Name,CitizenId,Coords,PropertyType,police_inspection")
 SetVar( CitizenId= Address(#CitizenId#))
 TxForm{ Contract: EditProperty}
 
