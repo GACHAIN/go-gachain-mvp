@@ -3010,14 +3010,14 @@ DivsEnd:
 
 PageEnd:`,
 `pc_EditLand #= ContractConditions("MainCondition")`,
-`p_EditProperty #= Title:Edit property
+`p_EditProperty #= Title:LangJS(edit_property)
 UList(breadcrumb, ol)
-    LiTemplate(Property, Property)
-    Li(Edit)
+    LiTemplate(Property, LangJS(property))
+    Li(LangJS(edit))
 UListEnd:
-PageTitle: Editing property
+PageTitle: LangJS(editing_property)
 
-ValueById(#state_id#_property, #PropertyId#, "name,citizen_id,coords,type,police_inspection", "Name,CitizenId,Coords,PropertyType,police_inspection")
+ValueById(#state_id#_property, #PropertyId#, "name,citizen_id,coords,type,police_inspection", "$name$,$citizen_id$,$coords$,$property_type$,$police_inspection$")
 SetVar( CitizenId= Address(#CitizenId#))
 TxForm{ Contract: EditProperty}
 
@@ -6020,7 +6020,7 @@ SetVar(`pa_buildings_use_class #= Shops, Financial and professional services, Re
 `pac_notification_ClosureType #= ContractConditions("MainCondition")`,
 `pa_notification_icon #= fa-bell,fa-comment,fa-envelope,fa-bookmark,fa-check,fa-exclamation-triangle,fa-info-circle`,
 `pac_notification_icon #= ContractConditions("MainCondition")`,
-`pa_property_types #= Residential,Commercial,Land`,
+`pa_property_types #= $residential$,$commercial$,$land$`,
 `pac_property_types #= ContractConditions("MainCondition")`,
 `pa_roles_types #= Assigned,Elective`,
 `pac_roles_types #= ContractConditions("MainCondition")`,

@@ -107,6 +107,8 @@ Lang = {
 	"change": "Change",
 	"not_limited": "Not limited",
 	"member_id": "Member ID",
+	"edit_property": "Edit property",
+	"editing_property": "Editing property",
 /** ================================================= */
 	"installation": "Installation",
 	"mode": "Mode",
