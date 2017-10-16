@@ -107,6 +107,8 @@ Lang = {
 	"change": "更改",
 	"not_limited": "永不過期",
 	"member_id": "成員ID",
+	"edit_property": "編輯財產",
+	"editing_property": "编辑属性",
 /** ================================================= */
 	"installation": "安裝",
 	"mode": "模式",
