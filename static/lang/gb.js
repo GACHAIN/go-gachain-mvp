@@ -109,6 +109,12 @@ Lang = {
 	"member_id": "Member ID",
 	"edit_property": "Edit property",
 	"editing_property": "Editing property",
+	"chat_history": "Chat history",
+	"no_unanswered_messages": "No unanswered messages",
+	"unanswered_messages_1": "Unanswered messages from",
+	"unanswered_messages_2": "",
+	"write_a_message": "Write a message...",
+	"write_a_message_for_the_role": "Write a message for the role...",
 /** ================================================= */
 	"installation": "Installation",
 	"mode": "Mode",

@@ -109,6 +109,12 @@ Lang = {
 	"member_id": "成员ID",
 	"edit_property": "编辑财产",
 	"editing_property": "编辑属性",
+	"chat_history": "交流记录",
+	"no_unanswered_messages": "没有未回复的信息",
+	"unanswered_messages_1": "来自",
+	"unanswered_messages_2": "未回复的消息",
+	"write_a_message": "请输入信息内容",
+	"write_a_message_for_the_role": "写一个消息为角色",
 /** ================================================= */
 	"installation": "安装",
 	"mode": "模式",
