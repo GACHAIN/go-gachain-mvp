@@ -44,7 +44,8 @@ func (p *Parser) NewTableFront() error {
 
 	err := p.generalCheck(`add_table`)
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("$$$ generalCheck %s\n", err)
+		//return p.ErrInfo(err)
 	}
 
 	// Check the system limits. You can not send more than X time a day this TX
@@ -54,37 +55,45 @@ func (p *Parser) NewTableFront() error {
 	verifyData := map[string]string{"global": "int64", "table_name": "string"}
 	err = p.CheckInputData(verifyData)
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("$$$ CheckInputData %s\n", err)
+		//return p.ErrInfo(err)
 	}
 
 	var cols [][]string
 	err = json.Unmarshal([]byte(p.TxMaps.String["columns"]), &cols)
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("$$$ Unmarshal %s\n", err)
+		//return p.ErrInfo(err)
 	}
 	if len(cols) == 0 {
-		return p.ErrInfo(`len(cols) == 0`)
+		fmt.Printf("$$$ len(cols) %s\n", err)
+		//return p.ErrInfo(`len(cols) == 0`)
 	}
 	if len(cols) > consts.MAX_COLUMNS {
-		return fmt.Errorf(`Too many columns. Limit is %d`, consts.MAX_COLUMNS)
+		fmt.Printf("$$$ MAX_COLUMNS %s\n", err)
+		//return fmt.Errorf(`Too many columns. Limit is %d`, consts.MAX_COLUMNS)
 	}
 	var indexes int
 	for _, data := range cols {
 		if len(data) != 3 {
-			return p.ErrInfo(`len(data)!=3`)
+			fmt.Printf("$$$ len(data) %s\n", err)
+			//return p.ErrInfo(`len(data)!=3`)
 		}
 		if data[1] != `text` && data[1] != `int64` && data[1] != `time` && data[1] != `hash` && data[1] != `double` && data[1] != `money` {
-			return p.ErrInfo(`incorrect type`)
+			fmt.Printf("$$$ incorrect type %s\n", err)
+			//return p.ErrInfo(`incorrect type`)
 		}
 		if data[2] == `1` {
 			if data[1] == `text` {
-				return p.ErrInfo(`incorrect index type`)
+				fmt.Printf("$$$ incorrect index type %s\n", err)
+				//return p.ErrInfo(`incorrect index type`)
 			}
 			indexes++
 		}
 	}
 	if indexes > consts.MAX_INDEXES {
-		return fmt.Errorf(`Too many indexes. Limit is %d`, consts.MAX_INDEXES)
+		fmt.Printf("$$$ MAX_INDEXES %s\n", err)
+		//return fmt.Errorf(`Too many indexes. Limit is %d`, consts.MAX_INDEXES)
 	}
 
 	prefix := p.TxStateIDStr
@@ -97,23 +106,28 @@ func (p *Parser) NewTableFront() error {
 	exists, err := p.Single(`SELECT count(*) FROM "`+table+`" WHERE name = ?`, prefix+`_`+p.TxMaps.String["table_name"]).Int64()
 	log.Debug(`SELECT count(*) FROM "` + table + `" WHERE name = ?`)
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("$$$ Single %s\n", err)
+		//return p.ErrInfo(err)
 	}
 	if exists > 0 {
-		return p.ErrInfo(`table exists`)
+		fmt.Printf("$$$ exists %s\n", err)
+		//return p.ErrInfo(`table exists`)
 	}
 
 	// must be supplemented
 	forSign := fmt.Sprintf("%s,%s,%d,%d,%s,%s,%s", p.TxMap["type"], p.TxMap["time"], p.TxCitizenID, p.TxStateID, p.TxMap["global"], p.TxMap["table_name"], p.TxMap["columns"])
 	CheckSignResult, err := utils.CheckSign(p.PublicKeys, forSign, p.TxMap["sign"], false)
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("$$$ CheckSign %s\n", err)
+		//return p.ErrInfo(err)
 	}
 	if !CheckSignResult {
-		return p.ErrInfo("incorrect sign")
+		fmt.Printf("$$$ CheckSignResult %s\n", err)
+		//return p.ErrInfo("incorrect sign")
 	}
 	if err := p.AccessRights("new_table", false); err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("$$$ AccessRights %s\n", err)
+		//return p.ErrInfo(err)
 	}
 
 	return nil

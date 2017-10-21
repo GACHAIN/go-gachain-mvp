@@ -69,34 +69,41 @@ func (p *Parser) NewStateGlobal(country, currency string) error {
 func (p *Parser) NewStateFront() error {
 	err := p.generalCheck(`new_state`)
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf(">>> generalCheck %s\n", err)
+		//return p.ErrInfo(err)
 	}
 
 	// Check InputData
 	verifyData := map[string]string{"state_name": "state_name", "currency_name": "currency_name"}
 	err = p.CheckInputData(verifyData)
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf(">>> CheckInputData %s\n", err)
+		//return p.ErrInfo(err)
 	}
 
 	forSign := fmt.Sprintf("%s,%s,%d,%s,%s", p.TxMap["type"], p.TxMap["time"], p.TxWalletID, p.TxMap["state_name"], p.TxMap["currency_name"])
 	CheckSignResult, err := utils.CheckSign(p.PublicKeys, forSign, p.TxMap["sign"], false)
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf(">>> CheckSign %s\n", err)
+		//return p.ErrInfo(err)
 	}
 	if !CheckSignResult {
-		return p.ErrInfo("incorrect sign")
+		fmt.Printf(">>> CheckSignResult %s\n", err)
+		//return p.ErrInfo("incorrect sign")
 	}
 	country := string(p.TxMap["state_name"])
 	if exist, err := p.IsState(country); err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf(">>> IsState %s\n", err)
+		//return p.ErrInfo(err)
 	} else if exist > 0 {
-		return fmt.Errorf(`State %s already exists`, country)
+		fmt.Printf(">>> exist %s\n", err)
+		//return fmt.Errorf(`State %s already exists`, country)
 	}
 
 	err = p.NewStateGlobal(country, string(p.TxMap["currency_name"]))
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf(">>> NewStateGlobal %s\n", err)
+		//return p.ErrInfo(err)
 	}
 	return nil
 }

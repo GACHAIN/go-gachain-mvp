@@ -42,7 +42,8 @@ func (p *Parser) NewStateParametersInit() error {
 func (p *Parser) NewStateParametersFront() error {
 	err := p.generalCheck(`new_state_parameters`)
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("--- CheckSign %s\n", err)
+		//return p.ErrInfo(err)
 	}
 
 	// Check the system limits. You can not send more than X time a day this TX
@@ -92,17 +93,20 @@ func (p *Parser) NewStateParametersFront() error {
 	*/
 	if len(p.TxMap["conditions"]) > 0 {
 		if err := smart.CompileEval(string(p.TxMap["conditions"]), uint32(p.TxStateID)); err != nil {
-			return p.ErrInfo(err)
+			fmt.Printf("--- CompileEval %s\n", err)
+			//return p.ErrInfo(err)
 		}
 	}
 	// must be supplemented
 	forSign := fmt.Sprintf("%s,%s,%d,%d,%s,%s,%s", p.TxMap["type"], p.TxMap["time"], p.TxCitizenID, p.TxStateID, p.TxMap["name"], p.TxMap["value"], p.TxMap["conditions"])
 	CheckSignResult, err := utils.CheckSign(p.PublicKeys, forSign, p.TxMap["sign"], false)
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("--- CheckSign %s\n", err)
+		//return p.ErrInfo(err)
 	}
 	if !CheckSignResult {
-		return p.ErrInfo("incorrect sign")
+		fmt.Printf("--- CheckSignResult %s\n", err)
+		//return p.ErrInfo("incorrect sign")
 	}
 
 	return nil

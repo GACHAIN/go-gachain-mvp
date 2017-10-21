@@ -41,7 +41,8 @@ func (p *Parser) EditColumnInit() error {
 func (p *Parser) EditColumnFront() error {
 	err := p.generalCheck(`edit_column`)
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("&&& generalCheck %s\n", err)
+		//return p.ErrInfo(err)
 	}
 
 	// Check InputData
@@ -57,22 +58,27 @@ func (p *Parser) EditColumnFront() error {
 	}
 	exists, err := p.Single(`select count(*) from "`+table+`" where (columns_and_permissions->'update'-> ? ) is not null AND name = ?`, p.TxMaps.String["column_name"], p.TxMaps.String["table_name"]).Int64()
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("&&& Single %s\n", err)
+		//return p.ErrInfo(err)
 	}
 	if exists == 0 {
-		return p.ErrInfo(`column not exists`)
+		fmt.Printf("&&& exists %s\n", err)
+		//return p.ErrInfo(`column not exists`)
 	}
 
 	forSign := fmt.Sprintf("%s,%s,%d,%d,%s,%s,%s", p.TxMap["type"], p.TxMap["time"], p.TxCitizenID, p.TxStateID, p.TxMap["table_name"], p.TxMap["column_name"], p.TxMap["permissions"])
 	CheckSignResult, err := utils.CheckSign(p.PublicKeys, forSign, p.TxMap["sign"], false)
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("&&& CheckSign %s\n", err)
+		//return p.ErrInfo(err)
 	}
 	if !CheckSignResult {
-		return p.ErrInfo("incorrect sign")
+		fmt.Printf("&&& CheckSignResult %s\n", err)
+		//return p.ErrInfo("incorrect sign")
 	}
 	if err = p.AccessTable(p.TxMaps.String["table_name"], `general_update`); err != nil {
-		return err
+		fmt.Printf("&&& AccessTable %s\n", err)
+		//return err
 	}
 
 	return nil
