@@ -1448,8 +1448,11 @@ SetVar(`sc_AddLand #= contract AddLand {
 	}
 	action 
 	{
-	    
-	  DBUpdate(Table( "citizens"), $citizen, "name,name_last,gender,avatar",$name_first,$name_last,$gender,$photo)
+	  if $photo != "" {
+	      DBUpdate(Table( "citizens"), $citizen, "name,name_last,gender,avatar",$name_first,$name_last,$gender,$photo)
+	  } else {
+	      DBUpdate(Table( "citizens"), $citizen, "name,name_last,gender",$name_first,$name_last,$gender)
+	  }
 	}
 }
 
