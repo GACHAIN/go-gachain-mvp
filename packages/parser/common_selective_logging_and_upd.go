@@ -57,8 +57,8 @@ func (p *Parser) selectiveLoggingAndUpd(fields []string, ivalues []interface{}, 
 					vlen = len(v.(string))
 				}
 			}
-			if isCustom && vlen > 32 {
-				return ``, fmt.Errorf(`hash value cannot be larger than 32 bytes`)
+			if isCustom && vlen > 64 {
+				return ``, fmt.Errorf(`hash value cannot be larger than 64 bytes`)
 			}
 		}
 	}
