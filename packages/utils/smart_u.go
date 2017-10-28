@@ -1504,7 +1504,7 @@ func ImageInput(vars *map[string]string, pars ...string) string {
 	}
 	return fmt.Sprintf(`<textarea style="display:none" class="form-control" id="%[1]s"></textarea>
 			<button type="button" class="btn btn-primary" onClick="openImageEditor('img%[1]s', '%[1]s', '%s', '%d', '%d');">
-			<i class="fa fa-file-image-o"></i> &nbsp;Add/Edit Image</button>`, id, ratio, width, height)
+			<i class="fa fa-file-image-o"></i> &nbsp;<span class="lang" lang-id="add_edit_image">Add/Edit Image</span></button>`, id, ratio, width, height)
 }
 
 // StateVal returns par[1]-th value of pars[0] state param
