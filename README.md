@@ -20,6 +20,7 @@ go install github.com/GACHAIN/go-gachain-mvp
 ```
 
 # Running
+Application requires running PostgreSQL server
 
 Create gachain directory and copy binary:
 ```

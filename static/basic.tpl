@@ -1448,8 +1448,11 @@ SetVar(`sc_AddLand #= contract AddLand {
 	}
 	action 
 	{
-	    
-	  DBUpdate(Table( "citizens"), $citizen, "name,name_last,gender,avatar",$name_first,$name_last,$gender,$photo)
+	  if $photo != "" {
+	      DBUpdate(Table( "citizens"), $citizen, "name,name_last,gender,avatar",$name_first,$name_last,$gender,$photo)
+	  } else {
+	      DBUpdate(Table( "citizens"), $citizen, "name,name_last,gender",$name_first,$name_last,$gender)
+	  }
 	}
 }
 
@@ -2541,9 +2544,9 @@ DivsEnd:
 
 PageEnd:`,
 `pc_AddProperty #= ContractConditions("MainCondition")`,
-`p_Chat_history #= Title: Chat history
+`p_Chat_history #= Title: LangJS(chat_history)
 
-Navigation(LiTemplate(MyChats, LangJS(my_chats)), Chat history)
+Navigation(LiTemplate(MyChats, LangJS(my_chats)), LangJS(chat_history))
 
 If(#vPageValue#==-1)
     SetVar(showAllUnreplied=1)
@@ -2571,7 +2574,7 @@ Else:
 IfEnd:
 
 Divs(md-12, panel panel-default elastic data-sweet-alert)
-    Div(panel-heading, Div(panel-title, Unanswered mesages from If(#to_role#!=0, LinkPage(roles_view, #toRoleName#, "RoleName:'#toRoleName#',isSearch:1", profile-flag text-blue), #user_name#)))
+    Div(panel-heading, Div(panel-title, LangJS(unanswered_messages_1) If(#to_role#!=0, LinkPage(roles_view, #toRoleName#, "RoleName:'#toRoleName#',isSearch:1", profile-flag text-blue), #user_name#) LangJS(unanswered_messages_2)))
     Divs: panel-body
             GetList(messages, #state_id#_chat_private_messages, "id,sender,receiver,sender_avatar,sender_name,message,sender_role_id,receiver_role_id","(#as_role#=0 and #to_role#=0 and sender_role_id=0 and receiver_role_id=0 and ((#citizen# = sender and #citizenId# = receiver) or (#citizen# = receiver and #citizenId# = sender))) or (#as_role# > 0 and ((#as_role# = sender_role_id and #citizenId# = receiver) or (#as_role# = receiver_role_id and #citizenId# = sender))) or (#to_role# > 0 and ((#to_role# = sender_role_id and #citizen# = receiver) or (#to_role# = receiver_role_id and #citizen# = sender)))", "id")
             ForList(messages)
@@ -2607,12 +2610,12 @@ DivsEnd:
             ForListEnd:
     DivsEnd:
     If (#noNewMessages#)
-        Div(list-group-item, Small('', No unanswered messages))
+        Div(list-group-item, Small('', LangJS(no_unanswered_messages)))
     IfEnd:
 DivsEnd:
 
 Divs(md-12, panel panel-default elastic data-sweet-alert)
-    Div(panel-heading, Div(panel-title, Chat history))
+    Div(panel-heading, Div(panel-title, LangJS(chat_history)))
     Divs: panel-body
         ForList(messages)
             Divs: list-group-item list-group-item-hover
@@ -2631,9 +2634,9 @@ Divs(md-12, panel panel-default elastic data-sweet-alert)
     
     Divs(panel-footer)
         Divs(input-group)
-            Input(chat_message,form-control,Write a message...,text)
+            Input(chat_message,form-control,$write_a_message$,text)
             Divs(input-group-btn)
-                    TxButton{ClassBtn: fa fa-paper-plane btn btn-default btn-sm bl0 radius-tl-clear radius-bl-clear,Contract: chat_send_private_message, Name: Send, Inputs: "to#=citizenId, text=chat_message, as_role#=as_role, to_role#=to_role", OnSuccess: "template,Chat_history,vPageValue:-1,citizenId:'#citizenId#',as_role:'#as_role#',to_role:'#to_role#'"}
+                    TxButton{ClassBtn: fa fa-paper-plane btn btn-default btn-sm bl0 radius-tl-clear radius-bl-clear,Contract: chat_send_private_message, Name: LangJS(send), Inputs: "to#=citizenId, text=chat_message, as_role#=as_role, to_role#=to_role", OnSuccess: "template,Chat_history,vPageValue:-1,citizenId:'#citizenId#',as_role:'#as_role#',to_role:'#to_role#'"}
                 IfEnd:
             DivsEnd:
         DivsEnd:
@@ -2777,7 +2780,7 @@ If(#citizenId#!=#citizen#)
 Divs(md-12, panel panel-primary elastic data-sweet-alert)
     Divs(panel-footer)
         Divs(input-group)
-            Input(chat_message,form-control,Write a message...,text)
+            Input(chat_message,form-control,$write_a_message$,text)
             Divs(input-group-btn)
                 SetVar(as_role=0)
                 SetVar(to_role=0)
@@ -3455,7 +3458,7 @@ Divs(md-6, panel panel-default elastic data-sweet-alert)
                 Input(RecipientID, "form-control  m-b hidden disabled=''",integer,text,"" )
             DivsEnd:
             Divs(input-group)
-                Input(chat_message,form-control,Write a message for the role...,text)
+                Input(chat_message,form-control,$write_a_message_for_the_role$,text)
                 Divs(input-group-btn)
                     SetVar(to=0,as_role=0)
                     TxButton{ClassBtn: fa fa-paper-plane btn btn-default btn-sm bl0 radius-tl-clear radius-bl-clear,Contract:chat_send_private_message, Name: Send, Inputs: "text=chat_message,to_role=RoleID,as_role#=as_role,to#=to", OnSuccess: "template,MyChats"}

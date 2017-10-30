@@ -2,6 +2,7 @@ function gob(e) { if (typeof (e) == 'object') return (e); if (document.getElemen
 var map;
 var polyShape;
 var markerShape;
+var miniMapNum = 0;
 //var oldDirMarkers = [];
 //var tmpPolyLine;
 var drawnShapes = [];
@@ -70,15 +71,12 @@ var polygonstyles = [];
 //var rectanglestyles = [];
 var circlestyles = [];
 var markerstyles = [];
-var geocoder; // = new google.maps.Geocoder();
 //var startLocation;
 var endLocation;
 //var dircount;
 var dircountstart;
 var firstdirclick = 0;
 var dirmarknum = 1;
-var directionsDisplay;
-var directionsService = new google.maps.DirectionsService();
 var directionsYes = 0;
 var destinations = [];
 var removedirectionleg = 0;
@@ -86,47 +84,45 @@ var removedirectionleg = 0;
 //var oldpoint = null;
 var prevpoint;
 var prevnumber;
-var infowindow = new google.maps.InfoWindow();//({size: new google.maps.Size(150,50)});
-var tmpPolyLine = new google.maps.Polyline({
+var directionsService = null;
+var infoWindow = new BMap.InfoWindow('', {
+    width: 150,
+    height: 50
+});
+var tmpPolyLine = new BMap.Polyline([], {
     strokeColor: "#00FF00",
     strokeOpacity: 0.8,
     strokeWeight: 2
 });
-var tinyIcon = new google.maps.MarkerImage(
+var tinyIcon = new BMap.Icon(
     'static/img/marker_red.png',
-    new google.maps.Size(12, 20),
-    new google.maps.Point(0, 0),
-    new google.maps.Point(6, 16)
+    new BMap.Size(12, 20),
+    {}
 );
-/*var tinyShadow = new google.maps.MarkerImage(
+/*var tinyShadow = new BMap.Icon(
     'icons/marker_20_shadow.png',
-    new google.maps.Size(22,20),
-    new google.maps.Point(6,20),
-    new google.maps.Point(5,1)
+    new BMap.Size(22,20),
+    {}
 );*/
-var imageNormal = new google.maps.MarkerImage(
+var imageNormal = new BMap.Icon(
     "images/square.png",
-    new google.maps.Size(11, 11),
-    new google.maps.Point(0, 0),
-    new google.maps.Point(6, 6)
+    new BMap.Size(11, 11),
+    {}
 );
-var imageHover = new google.maps.MarkerImage(
+var imageHover = new BMap.Icon(
     "images/square_over.png",
-    new google.maps.Size(11, 11),
-    new google.maps.Point(0, 0),
-    new google.maps.Point(6, 6)
+    new BMap.Size(11, 11),
+    {}
 );
-var imageNormalMidpoint = new google.maps.MarkerImage(
+var imageNormalMidpoint = new BMap.Icon(
     "images/square_transparent.png",
-    new google.maps.Size(11, 11),
-    new google.maps.Point(0, 0),
-    new google.maps.Point(6, 6)
+    new BMap.Size(11, 11),
+    {}
 );
-/*var imageHoverMidpoint = new google.maps.MarkerImage(
+/*var imageHoverMidpoint = new BMap.Icon(
 	"square_transparent_over.png",
-	new google.maps.Size(11, 11),
-	new google.maps.Point(0, 0),
-	new google.maps.Point(6, 6)
+	new BMap.Size(11, 11),
+	{}
 );*/
 function polystyle() {
     this.name = "Lump";
@@ -155,7 +151,7 @@ function circstyle() {
 }
 function markerstyleobject() {
     this.name = "markerstyle";
-    this.icon = "//maps.google.com/intl/en_us/mapfiles/ms/micons/red-dot.png";
+    this.icon = "static/img/map/red-dot.png";
 }
 function placemarkobject() {
     this.name = "NAME";
@@ -198,37 +194,34 @@ function createmarkerstyleobject() {
 }
 function preparePolyline() {
     var polyOptions = {
-        path: polyPoints,
         strokeColor: polylinestyles[lcur].color,
         strokeOpacity: polylinestyles[lcur].lineopac,
         strokeWeight: polylinestyles[lcur].width
     };
-    polyShape = new google.maps.Polyline(polyOptions);
-    polyShape.setMap(map);
+    polyShape = new BMap.Polyline(polyPoints, polyOptions);
+    map.addOverlay(polyShape);
     /*var tmpPolyOptions = {
     	strokeColor: polylinestyles[lcur].color,
     	strokeOpacity: polylinestyles[lcur].lineopac,
     	strokeWeight: polylinestyles[lcur].width
     };
-    tmpPolyLine = new google.maps.Polyline(tmpPolyOptions);
-    tmpPolyLine.setMap(map);*/
+    tmpPolyLine = new BMap.Polyline([], tmpPolyOptions);
+    map.addOverlay(tmpPolyLine);*/
 }
 
 function preparePolygon() {
     var polyOptions = {
-        path: polyPoints,
         strokeColor: polygonstyles[pcur].color,
         strokeOpacity: polygonstyles[pcur].lineopac,
         strokeWeight: polygonstyles[pcur].width,
         fillColor: polygonstyles[pcur].fill,
         fillOpacity: polygonstyles[pcur].fillopac
     };
-    polyShape = new google.maps.Polygon(polyOptions);
-    polyShape.setMap(map);
+    polyShape = new BMap.Polygon(polyPoints, polyOptions);
+    map.addOverlay(polyShape);
 }
 function activateRectangle() {
-    rectangle = new google.maps.Rectangle({
-        map: map,
+    rectangle = new BMap.Polygon([], {
         strokeColor: polygonstyles[pcur].color,
         strokeOpacity: polygonstyles[pcur].lineopac,
         strokeWeight: polygonstyles[pcur].width,
@@ -237,8 +230,7 @@ function activateRectangle() {
     });
 }
 function activateCircle() {
-    circle = new google.maps.Circle({
-        map: map,
+    circle = new BMap.Circle(new BMap.Point(0, 0), 0, {
         fillColor: circlestyles[ccur].fill,
         fillOpacity: circlestyles[ccur].fillopac,
         strokeColor: circlestyles[ccur].color,
@@ -247,19 +239,18 @@ function activateCircle() {
     });
 }
 function activateMarker() {
-    markerShape = new google.maps.Marker({
-        map: map,
+    markerShape = new BMap.Marker(new BMap.Point(0, 0), {
         icon: markerstyles[mcur].icon
     });
 }
 function initmap() {
-    geocoder = new google.maps.Geocoder();
-    var latlng = new google.maps.LatLng(StateCenterX, StateCenterY);//(45.0,7.0);//45.074723, 7.656433
-    var mapTypeIds = [];
-    for (var type in google.maps.MapTypeId) {
-        mapTypeIds.push(google.maps.MapTypeId[type]);
-    }
-    mapTypeIds.push("OSM");
+    var latlng = new BMap.Point(StateCenterY, StateCenterX);//(45.0,7.0);//45.074723, 7.656433
+    var mapTypeIds = [
+        BMAP_NORMAL_MAP,
+        BMAP_PERSPECTIVE_MAP,
+        BMAP_SATELLITE_MAP,
+        BMAP_HYBRID_MAP
+    ];
     copyrightNode = document.createElement('div');
     copyrightNode.id = 'copyright-control';
     copyrightNode.style.fontSize = '11px';
@@ -268,34 +259,29 @@ function initmap() {
     copyrightNode.style.whiteSpace = 'nowrap';
     //copyrightNode.index = 0;
     var myOptions = {
-        zoom: StateZoom,
-        center: latlng,
         draggableCursor: 'default',
         draggingCursor: 'pointer',
         scaleControl: true,
         mapTypeControl: true,
         mapTypeControlOptions: { mapTypeIds: mapTypeIds },
-        //mapTypeControlOptions:{style: google.maps.MapTypeControlStyle.DROPDOWN_MENU},
-        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        //mapTypeControlOptions:{style: BMAP_MAPTYPE_CONTROL_DROPDOWN},
+        mapType: BMAP_NORMAL_MAP,
         styles: [{ featureType: 'poi', stylers: [{ visibility: 'off' }] }],
         streetViewControl: false
     };
-    map = new google.maps.Map(gob('map_canvas'), myOptions);
-    map.mapTypes.set("OSM", new google.maps.ImageMapType({
-        getTileUrl: function (coord, zoom) {
-            return "http://tile.openstreetmap.org/" + zoom + "/" + coord.x + "/" + coord.y + ".png";
-        },
-        tileSize: new google.maps.Size(256, 256),
-        name: "OpenStreetMap",
-        maxZoom: 18
-    }));
-    google.maps.event.addListener(map, 'maptypeid_changed', updateCopyrights);
-    map.controls[google.maps.ControlPosition.BOTTOM_RIGHT].push(copyrightNode);
+    map = new BMap.Map('map_canvas', myOptions);
+    map.enableScrollWheelZoom();
+    map.centerAndZoom(latlng, StateZoom);
+    map.addControl(new BMap.NavigationControl());
+    map.addControl(new BMap.ScaleControl());
+    map.addControl(new BMap.OverviewMapControl());
+    map.addControl(new BMap.MapTypeControl());
+    map.addControl(new BMap.GeolocationControl());
+    map.addEventListener('maptypeid_changed', updateCopyrights);
 
     //var myStyle = [{featureType: 'poi', stylers: [{visibility: 'off'}]}];
     //map.setOptions({styles: myStyle}); // styles and stylers are arrays
-    polyPoints = new google.maps.MVCArray(); // collects coordinates
-    tmpPolyLine.setMap(map);
+    map.addOverlay(tmpPolyLine);
     createplacemarkobject();
     createlinestyleobject();
     createpolygonstyleobject();
@@ -303,15 +289,15 @@ function initmap() {
     createmarkerstyleobject();
     preparePolyline(); // create a Polyline object
 
-    google.maps.event.addListener(map, 'click', addLatLng);
-    google.maps.event.addListener(map, 'zoom_changed', mapzoom);
+    map.addEventListener('click', addLatLng);
+    map.addEventListener('zoom_changed', mapzoom);
     cursorposition(map);
 }
 // Called by initmap, addLatLng, drawRectangle, drawCircle, drawpolywithhole
 function cursorposition(mapregion) {
-    google.maps.event.addListener(mapregion, 'mousemove', function (point) {
-        var LnglatStr6 = point.latLng.lng().toFixed(6) + ', ' + point.latLng.lat().toFixed(6);
-        var latLngStr6 = point.latLng.lat().toFixed(6) + ', ' + point.latLng.lng().toFixed(6);
+    mapregion.addEventListener('mousemove', function (e) {
+        var LnglatStr6 = e.point.lng.toFixed(6) + ', ' + e.point.lat.toFixed(6);
+        var latLngStr6 = e.point.lat.toFixed(6) + ', ' + e.point.lng.toFixed(6);
         gob('over').options[0].text = LnglatStr6;
         gob('over').options[1].text = latLngStr6;
     });
@@ -323,9 +309,9 @@ function updateCopyrights() {
         copyrightNode.innerHTML = "";
     }
 }
-function addLatLng(point) {
+function addLatLng(e) {
     if (directionsYes == 1) {
-        drawDirections(point.latLng);
+        drawDirections(e.point);
         return;
     }
     if (plmcur != placemarks.length - 1) {
@@ -334,21 +320,22 @@ function addLatLng(point) {
 
     // Rectangle and circle can't collect points with getPath. solved by letting Polyline collect the points and then erase Polyline
     polyPoints = polyShape.getPath();
+    polyPoints.push(e.point);
     // This codeline does the drawing on the map
-    polyPoints.insertAt(polyPoints.length, point.latLng); // or: polyPoints.push(point.latLng)
+    polyShape.setPath(polyPoints);
     if (polyPoints.length == 1) {
-        startpoint = point.latLng;
+        startpoint = e.point;
         placemarks[plmcur].point = startpoint; // stored because it's to be used when the shape is clicked on as a stored shape
         setstartMarker(startpoint);
         if (toolID == 5) {
             drawMarkers(startpoint);
         }
     }
-    if (polyPoints.length == 2 && toolID == 3) createrectangle(point);
-    if (polyPoints.length == 2 && toolID == 4) createcircle(point);
+    if (polyPoints.length == 2 && toolID == 3) createrectangle(e.point);
+    if (polyPoints.length == 2 && toolID == 4) createcircle(e.point);
     if (toolID == 1 || toolID == 2) { // if polyline or polygon
-        var stringtobesaved = '"' + point.latLng.lat().toFixed(6) + '","' + point.latLng.lng().toFixed(6) + '"';
-        var kmlstringtobesaved = '"' + point.latLng.lng().toFixed(6) + '","' + point.latLng.lat().toFixed(6) + '"';
+        var stringtobesaved = '"' + e.point.lat.toFixed(6) + '","' + e.point.lng.toFixed(6) + '"';
+        var kmlstringtobesaved = '"' + e.point.lng.toFixed(6) + '","' + e.point.lat.toFixed(6) + '"';
         //Cursor position, when inside polyShape, is registered with this listener
         cursorposition(polyShape);
         if (adder == 0) { //shape with no hole
@@ -370,45 +357,53 @@ function addLatLng(point) {
     }
 }
 function setstartMarker(point) {
-    startMarker = new google.maps.Marker({
-        position: point,
-        map: map
+    startMarker = new BMap.Marker(point, {
+        title: '#' + polyPoints.length
     });
-    startMarker.setTitle("#" + polyPoints.length);
+    map.addOverlay(startMarker);
 }
-function createrectangle(point) {
+function createrectangle(e) {
     // startMarker is southwest point. now set northeast
-    nemarker = new google.maps.Marker({
-        position: point.latLng,
+    nemarker = new BMap.Marker(e.point, {
         draggable: true,
         raiseOnDrag: false,
-        title: "Draggable",
-        map: map
+        title: "Draggable"
     });
-    google.maps.event.addListener(startMarker, 'dragend', drawRectangle);
-    google.maps.event.addListener(nemarker, 'dragend', drawRectangle);
+    startMarker.addEventListener('dragend', drawRectangle);
+    nemarker.addEventListener('dragend', drawRectangle);
     startMarker.setDraggable(true);
     //startMarker.setAnimation(null);
     startMarker.setTitle("Draggable");
     startMarker.setOptions({ raiseOnDrag: false });
-    polyShape.setMap(null); // remove the Polyline that has collected the points
+    map.removeOverlay(polyShape); // remove the Polyline that has collected the points
+    map.addOverlay(nemarker);
     polyPoints = [];
     drawRectangle();
+}
+function setRectangleBounds(rectangle, bounds) {
+    var sw = bounds.getSouthWest();
+    var ne = bounds.getNorthEast();
+    rectangle.setPath([
+        new BMap.Point(ne.lng, sw.lat),
+        ne,
+        new BMap.Point(sw.lng, ne.lat),
+        sw
+    ]);
 }
 function drawRectangle() {
     gob('EditButton').disabled = 'disabled';
     southWest = startMarker.getPosition(); // used in logCode6()
     northEast = nemarker.getPosition(); // used in logCode6()
-    var latLngBounds = new google.maps.LatLngBounds(
+    var latLngBounds = new BMap.Bounds(
         southWest,
         northEast
     );
-    rectangle.setBounds(latLngBounds);
+    setRectangleBounds(rectangle, latLngBounds);
     //Cursor position, when inside rectangle, is registered with this listener
     cursorposition(rectangle);
     // the Rectangle was created in activateRectangle(), called from newstart(), which may have been called from setTool()
-    var northWest = new google.maps.LatLng(southWest.lat(), northEast.lng());
-    var southEast = new google.maps.LatLng(northEast.lat(), southWest.lng());
+    var northWest = new BMap.Point(northEast.lng, southWest.lat);
+    var southEast = new BMap.Point(southWest.lng, northEast.lat);
     polyPoints = [];
     pointsArray = [];
     pointsArrayKml = [];
@@ -416,49 +411,47 @@ function drawRectangle() {
     polyPoints.push(northWest);
     polyPoints.push(northEast);
     polyPoints.push(southEast);*/
-    var stringtobesaved = '"' + southWest.lng().toFixed(6) + '","' + southWest.lat().toFixed(6) + '"';
+    var stringtobesaved = '"' + southWest.lng.toFixed(6) + '","' + southWest.lat.toFixed(6) + '"';
     pointsArrayKml.push(stringtobesaved);
-    stringtobesaved = '"' + southWest.lng().toFixed(6) + '","' + northEast.lat().toFixed(6) + '"';
+    stringtobesaved = '"' + southWest.lng.toFixed(6) + '","' + northEast.lat.toFixed(6) + '"';
     pointsArrayKml.push(stringtobesaved);
-    stringtobesaved = '"' + northEast.lng().toFixed(6) + '","' + northEast.lat().toFixed(6) + '"';
+    stringtobesaved = '"' + northEast.lng.toFixed(6) + '","' + northEast.lat.toFixed(6) + '"';
     pointsArrayKml.push(stringtobesaved);
-    stringtobesaved = '"' + northEast.lng().toFixed(6) + '","' + southWest.lat().toFixed(6) + '"';
+    stringtobesaved = '"' + northEast.lng.toFixed(6) + '","' + southWest.lat.toFixed(6) + '"';
     pointsArrayKml.push(stringtobesaved);
-    stringtobesaved = '"' + southWest.lat().toFixed(6) + '","' + southWest.lng().toFixed(6) + '"';
+    stringtobesaved = '"' + southWest.lat.toFixed(6) + '","' + southWest.lng.toFixed(6) + '"';
     pointsArray.push(stringtobesaved);
-    stringtobesaved = '"' + northEast.lat().toFixed(6) + '","' + southWest.lng().toFixed(6) + '"';
+    stringtobesaved = '"' + northEast.lat.toFixed(6) + '","' + southWest.lng.toFixed(6) + '"';
     pointsArray.push(stringtobesaved);
-    stringtobesaved = '"' + northEast.lat().toFixed(6) + '","' + northEast.lng().toFixed(6) + '"';
+    stringtobesaved = '"' + northEast.lat.toFixed(6) + '","' + northEast.lng.toFixed(6) + '"';
     pointsArray.push(stringtobesaved);
-    stringtobesaved = '"' + southWest.lat().toFixed(6) + '","' + northEast.lng().toFixed(6) + '"';
+    stringtobesaved = '"' + southWest.lat.toFixed(6) + '","' + northEast.lng.toFixed(6) + '"';
     pointsArray.push(stringtobesaved);
     southWest = northEast = null;
     if (codeID == 2) logCode6();
     if (codeID == 1) logCode2();
 }
-function createcircle(point) {
+function createcircle(e) {
     // startMarker is center point. now set radius
-    nemarker = new google.maps.Marker({
-        position: point.latLng,
+    nemarker = new BMap.Marker(e.point, {
         draggable: true,
         raiseOnDrag: false,
-        title: "Draggable",
-        map: map
+        title: "Draggable"
     });
-    google.maps.event.addListener(startMarker, 'drag', drawCircle);
-    google.maps.event.addListener(nemarker, 'drag', drawCircle);
+    startMarker.addEventListener('drag', drawCircle);
+    nemarker.addEventListener('drag', drawCircle);
     startMarker.setDraggable(true);
     startMarker.setAnimation(null);
     startMarker.setTitle("Draggable");
     drawCircle();
-    polyShape.setMap(null); // remove the Polyline that has collected the points
+    map.removeOverlay(polyShape); // remove the Polyline that has collected the points
     polyPoints = [];
 }
 function drawCircle() {
     centerPoint = startMarker.getPosition();
     radiusPoint = nemarker.getPosition();
     circle.bindTo('center', startMarker, 'position');
-    calc = distance(centerPoint.lat(), centerPoint.lng(), radiusPoint.lat(), radiusPoint.lng());
+    calc = distance(centerPoint.lat, centerPoint.lng, radiusPoint.lat, radiusPoint.lng);
     circle.setRadius(calc);
     //Cursor position, when inside circle, is registered with this listener
     cursorposition(circle);
@@ -479,34 +472,30 @@ function distance(lat1, lon1, lat2, lon2) {
 }
 
 function drawMarkers(point) {
-    if (startMarker) startMarker.setMap(null);
-    if (polyShape) polyShape.setMap(null);
+    if (startMarker) map.removeOverlay(startMarker);
+    if (polyShape) map.removeOverlay(polyShape);
     var id = plmcur;
-    placemarks[plmcur].jscode = point.lat().toFixed(6) + ',' + point.lng().toFixed(6);
-    placemarks[plmcur].kmlcode = point.lng().toFixed(6) + ',' + point.lat().toFixed(6);
+    placemarks[plmcur].jscode = point.lat.toFixed(6) + ',' + point.lng.toFixed(6);
+    placemarks[plmcur].kmlcode = point.lng.toFixed(6) + ',' + point.lat.toFixed(6);
     activateMarker();
     markerShape.setPosition(point);
     var marker = markerShape;
-    tinyMarker = new google.maps.Marker({
-        position: placemarks[plmcur].point,
-        map: map,
+    tinyMarker = new BMap.Marker(placemarks[plmcur].point, {
         icon: tinyIcon
     });
-    google.maps.event.addListener(marker, 'click', function (event) {
+    marker.addEventListener('click', function (event) {
         plmcur = id;
         markerShape = marker;
         var html = "<b>" + placemarks[plmcur].name + "</b> <br/>" + placemarks[plmcur].desc;
-        infowindow.setContent(html);
-        if (tinyMarker) tinyMarker.setMap(null);
-        tinyMarker = new google.maps.Marker({
-            position: placemarks[plmcur].point,
-            map: map,
+        infoWindow.setContent(html);
+        if (tinyMarker) map.removeOverlay(tinyMarker);
+        tinyMarker = new BMap.Marker(placemarks[plmcur].point, {
             icon: tinyIcon
         });
         if (toolID != 5) toolID = gob('toolchoice').value = 5;
         if (codeID == 1) logCode9();
         if (codeID == 2) logCode8();
-        infowindow.open(map, marker);
+        map.openInfoWindow(infoWindow, point);
     });
     drawnShapes.push(markerShape);
     if (codeID == 2) logCode8();
@@ -519,7 +508,7 @@ function drawDirections(point) {
             origin: dirpointstart,
             destination: point,
             waypoints: waypts,
-            travelMode: google.maps.DirectionsTravelMode.DRIVING
+            travelMode: BMAP_ROUTE_TYPE_DRIVING
         };
         //oldpoint = point;
         waypts.push({ location: point, stopover: true });
@@ -530,7 +519,7 @@ function drawDirections(point) {
         request = {
             origin: dirpointstart,
             destination: point,
-            travelMode: google.maps.DirectionsTravelMode.DRIVING
+            travelMode: BMAP_ROUTE_TYPE_DRIVING
         };
         //oldpoint = point;
         waypts.push({ location: point, stopover: true });
@@ -544,14 +533,10 @@ function drawDirections(point) {
         dirline = plmcur;
         placemarks[dirline].shape = polyShape; // created in preparePolyline(), initiated in newstart() called from setTool()
         placemarks[dirline].point = dirpointstart;
-        directionsDisplay = new google.maps.DirectionsRenderer({
-            suppressMarkers: true,
-            preserveViewport: true
-        });
         request = {
             origin: dirpointstart,
             destination: point,
-            travelMode: google.maps.DirectionsTravelMode.DRIVING
+            travelMode: BMAP_ROUTE_TYPE_DRIVING
         };
         //destinations.push(request.destination);
         calcRoute(request);
@@ -562,24 +547,22 @@ function drawDirections(point) {
 }
 //}
 function calcRoute(request) {
-    directionsDisplay.setOptions({
-        polylineOptions: {
-            strokeColor: polylinestyles[lcur].color,
-            strokeOpacity: polylinestyles[lcur].lineopac,
-            strokeWeight: polylinestyles[lcur].width
-        }
-    });
-    if (firstdirclick == 1) directionsDisplay.setMap(map);
     firstdirclick++;
-
-    directionsService.route(request, RenderCustomDirections);
+    if (directionsService === null) {
+        directionsService = new BMap.DrivingRoute(map, {
+            onSearchComplete: function(result) { console.log(result); },
+            renderOptions: {
+                map: map
+            }
+        });
+    }
+    directionsService.search(request.origin, request.destination, {});
 }
-function RenderCustomDirections(response, status) {
-    if (status == google.maps.DirectionsStatus.OK) {
+function RenderCustomDirections(response) {
+    if (getNumPlans() > 0) {
         //var m = step + 1;
         //if(removedirectionleg == 1) m = m - 1;
-        directionsDisplay.setDirections(response);
-        var result = directionsDisplay.getDirections().routes[0];
+        var result = response.routes[0];
         var legs = response.routes[0].legs;
         polyPoints = [];
         pointsArray = [];
@@ -589,24 +572,24 @@ function RenderCustomDirections(response, status) {
         }*/
         for (var i = 0; i < result.overview_path.length; i++) {
             polyPoints.push(result.overview_path[i]);
-            pointsArray.push(result.overview_path[i].lat().toFixed(6) + ',' + result.overview_path[i].lng().toFixed(6));
-            pointsArrayKml.push(result.overview_path[i].lng().toFixed(6) + ',' + result.overview_path[i].lat().toFixed(6));
+            pointsArray.push(result.overview_path[i].lat.toFixed(6) + ',' + result.overview_path[i].lng.toFixed(6));
+            pointsArrayKml.push(result.overview_path[i].lng.toFixed(6) + ',' + result.overview_path[i].lat.toFixed(6));
         }
         polyShape.setPath(polyPoints);
         endLocation = new Object();
         if (step == 0) {
             createdirMarker(legs[step].start_location, legs[step].start_address);
-            markersArray.push(legs[step].start_location.lat().toFixed(6) + ',' + legs[step].start_location.lng().toFixed(6));
-            markersArrayKml.push(legs[step].start_location.lng().toFixed(6) + ',' + legs[step].start_location.lat().toFixed(6));
+            markersArray.push(legs[step].start_location.lat.toFixed(6) + ',' + legs[step].start_location.lng.toFixed(6));
+            markersArrayKml.push(legs[step].start_location.lng.toFixed(6) + ',' + legs[step].start_location.lat.toFixed(6));
             addresssArray.push(legs[step].start_address);
             //placemarks[plmcur].name = "Marker "+dirmarknum;
         }
         if (step > 0 && removedirectionleg == 0) {
-            endLocation.latlng = legs[step - 1].end_location;
+            endLocation.point = legs[step - 1].end_location;
             endLocation.address = legs[step - 1].end_address;
-            createdirMarker(endLocation.latlng, endLocation.address);
-            markersArray.push(endLocation.latlng.lat().toFixed(6) + ',' + endLocation.latlng.lng().toFixed(6));
-            markersArrayKml.push(endLocation.latlng.lng().toFixed(6) + ',' + endLocation.latlng.lat().toFixed(6));
+            createdirMarker(endLocation.point, endLocation.address);
+            markersArray.push(endLocation.point.lat.toFixed(6) + ',' + endLocation.point.lng.toFixed(6));
+            markersArrayKml.push(endLocation.point.lng.toFixed(6) + ',' + endLocation.point.lat.toFixed(6));
             addresssArray.push(endLocation.address);
             //placemarks[plmcur].name = "Marker "+dirmarknum;
         }
@@ -618,18 +601,18 @@ function RenderCustomDirections(response, status) {
         docudetails();
         //showthis('toppers');
     }
-    else alert(status);
+    else alert('No directions found');
 }
 function createdirMarker(latlng, html) {
-    if (tinyMarker) tinyMarker.setMap(null);
+    if (tinyMarker) map.removeOverlay(tinyMarker);
     createplacemarkobject();
     plmcur++; // plmcur = placemarks.length -1;
     activateMarker();
     placemarks[plmcur].name = "Marker " + dirmarknum;
     markerShape.setTitle(placemarks[plmcur].name + "\n" + html);
     markerShape.setPosition(latlng);
-    placemarks[plmcur].jscode = latlng.lat().toFixed(6) + ',' + latlng.lng().toFixed(6);
-    placemarks[plmcur].kmlcode = latlng.lng().toFixed(6) + ',' + latlng.lat().toFixed(6);
+    placemarks[plmcur].jscode = latlng.lat.toFixed(6) + ',' + latlng.lng.toFixed(6);
+    placemarks[plmcur].kmlcode = latlng.lng.toFixed(6) + ',' + latlng.lat.toFixed(6);
     placemarks[plmcur].desc = html;
     placemarks[plmcur].point = latlng;
     placemarks[plmcur].style = markerstyles[mcur].name;
@@ -639,16 +622,14 @@ function createdirMarker(latlng, html) {
     dirmarknum++;
     var marker = markerShape;
     var thisshape = plmcur;
-    google.maps.event.addListener(marker, 'click', function (event) {
+    marker.addEventListener('click', function (event) {
         markerShape = marker;
         plmcur = thisshape;
         //var htm = "<b>" + placemarks[thisshape].name + "</b> <br/>" + placemarks[thisshape].desc;
         if (polyPoints == 0) {
-            //infowindow.setContent(htm);
-            if (tinyMarker) tinyMarker.setMap(null);
-            tinyMarker = new google.maps.Marker({
-                position: placemarks[plmcur].point,
-                map: map,
+            //infoWindow.setContent(htm);
+            if (tinyMarker) map.removeOverlay(tinyMarker);
+            tinyMarker = new BMap.Marker(placemarks[plmcur].point, {
                 icon: tinyIcon
             });
             if (toolID != 5) {
@@ -657,7 +638,7 @@ function createdirMarker(latlng, html) {
             }
             if (codeID == 1) logCode9();
             if (codeID == 2) logCode8();
-            //infowindow.open(map,marker);
+            //map.openInfoWindow(infoWindow, latlng);
         }
     });
     drawnShapes.push(markerShape);
@@ -665,7 +646,7 @@ function createdirMarker(latlng, html) {
 // Called from deleteLastPoint() initiated by click on button
 function undo() {
     if (drawnShapes.length > 1) {
-        drawnShapes[drawnShapes.length - 1].setMap(null);
+        map.removeOverlay(drawnShapes[drawnShapes.length - 1]);
         destinations.pop();
         var point = destinations[destinations.length - 1];
         waypts.pop();
@@ -673,7 +654,7 @@ function undo() {
             origin: dirpointstart,
             destination: point,
             waypoints: waypts,
-            travelMode: google.maps.DirectionsTravelMode.DRIVING
+            travelMode: BMAP_ROUTE_TYPE_DRIVING
         };
         placemarks.pop();
         markersArray.pop();
@@ -690,23 +671,20 @@ function undo() {
 
 // Not used
 function setDirectionsMarker(point) {
-    var image = new google.maps.MarkerImage('http://www.birdtheme.org/useful/images/square.png');
-    var marker = new google.maps.Marker({
-        position: point,
-        map: map,
+    var image = new BMap.Icon('static/img/map/square.png',
+        new BMap.Size(12, 12),
+        {});
+    var marker = new BMap.Marker(point, {
         icon: image
     });
-    var shadow = new google.maps.MarkerImage('//maps.google.com/intl/en_us/mapfiles/ms/micons/msmarker.shadow.png',
-        new google.maps.Size(37, 32),
-        new google.maps.Point(16, 0),
-        new google.maps.Point(0, 32));
+    var shadow = new BMap.Icon('static/img/map/msmarker.shadow.png',
+        new BMap.Size(37, 32),
+        {});
     var title = "#" + markers.length;
     var id = plmcur;
     placemarks[plmcur].point = point;
-    placemarks[plmcur].coord = point.lng().toFixed(6) + ', ' + point.lat().toFixed(6);
-    /*var marker = new google.maps.Marker({
-        position: point,
-        map: map,
+    placemarks[plmcur].coord = point.lng.toFixed(6) + ', ' + point.lat.toFixed(6);
+    /*var marker = new BMap.Marker(point, {
         draggable: true,
         icon: image,
         shadow: shadow});*/
@@ -758,7 +736,7 @@ function setTool() {
             }*/
             placemarks[plmcur].style = polylinestyles[polylinestyles.length - 1].name;
             placemarks[plmcur].stylecur = polylinestyles.length - 1;
-            if (polyShape) polyShape.setMap(null);
+            if (polyShape) map.removeOverlay(polyShape);
             preparePolyline(); //if a polygon exists, it will be redrawn as polylines
             if (codeID == 1) logCode1(); // KML
             if (codeID == 2) logCode4(); // Javascipt
@@ -797,15 +775,15 @@ function setTool() {
             }*/
             placemarks[plmcur].style = polygonstyles[polygonstyles.length - 1].name;
             placemarks[plmcur].stylecur = polygonstyles.length - 1;
-            if (polyShape) polyShape.setMap(null);
+            if (polyShape) map.removeOverlay(polyShape);
             preparePolygon(); //if a polyline exists, it will be redrawn as a polygon
             if (codeID == 1) logCode2(); // KML
             if (codeID == 2) logCode4(); // Javascript
         }
         if (toolID == 3 || toolID == 4 || toolID == 5 || toolID == 6) {
-            if (polyShape) polyShape.setMap(null);
-            if (circle) circle.setMap(null);
-            if (rectangle) rectangle.setMap(null);
+            if (polyShape) map.removeOverlay(polyShape);
+            if (circle) map.removeOverlay(circle);
+            if (rectangle) map.removeOverlay(rectangle);
             directionsYes = 0;
             newstart();
         }
@@ -880,7 +858,7 @@ function nextshape() {
     //Set listener on current shape. Create new placemark object.
     //Increase counter for placemark
     increaseplmcur();
-    if (polyShape) drawnShapes.push(polyShape); // used in clearMap, to have it removed from the map, drawnShapes[i].setMap(null)
+    if (polyShape) drawnShapes.push(polyShape); // used in clearMap, to have it removed from the map, map.removeOverlay(drawnShapes[i]);
     if (outerShape) drawnShapes.push(outerShape);
     if (circle) drawnShapes.push(circle);
     if (rectangle) drawnShapes.push(rectangle);
@@ -898,9 +876,9 @@ function addpolyShapelistener() {
     // In v2 I can give a shape an ID and have that ID revealed, with the map listener, when the shape is clicked on
     // I can't do that in v3. Instead I put a listener on the shape
     if (toolID == 1 || toolID == 2) {
-        google.maps.event.addListener(polyShape, 'click', function (point) {
-            if (tinyMarker) tinyMarker.setMap(null);
-            if (startMarker) startMarker.setMap(null);
+        polyShape.addEventListener('click', function (point) {
+            if (tinyMarker) map.removeOverlay(tinyMarker);
+            if (startMarker) map.removeOverlay(startMarker);
             directionsYes = 0;
             polyShape = placemarks[thisshape].shape;
             plmcur = thisshape;
@@ -925,24 +903,24 @@ function addpolyShapelistener() {
                 outerArrayKml = placemarks[plmcur].kmlcode;
                 innerArraysKml = placemarks[plmcur].kmlholecode;
                 /*var polly = polyShape.getPaths();
-                polyPoints = polly.getAt(0);
-                var points = polly.getAt(0);
-                //alert(point.lng().toFixed(6));
+                polyPoints = polly[0];
+                var points = polly[0];
+                //alert(point.lng.toFixed(6));
                 for(var i = 0; i<points.length-1; i++) {
-                    outerArray.push(points.getAt(i).lat().toFixed(6) + ',' + points.getAt(i).lng().toFixed(6));
-                    outerArrayKml.push(points.getAt(i).lng().toFixed(6) + ',' + points.getAt(i).lat().toFixed(6));
+                    outerArray.push(points[i].lat.toFixed(6) + ',' + points[i].lng.toFixed(6));
+                    outerArrayKml.push(points[i].lng.toFixed(6) + ',' + points[i].lat.toFixed(6));
                 }
                 for(i = 1; i<polly.length; i++) {
-                    points = polly.getAt(i);
+                    points = polly[i];
                     if(i == polly.length-1) {
                         for(var j = 0; j<points.length; j++) {
-                            innerArray.push(points.getAt(j).lat().toFixed(6) + ',' + points.getAt(j).lng().toFixed(6));
-                            innerArrayKml.push(points.getAt(j).lng().toFixed(6) + ',' + points.getAt(j).lat().toFixed(6));
+                            innerArray.push(points[j].lat.toFixed(6) + ',' + points[j].lng.toFixed(6));
+                            innerArrayKml.push(points[j].lng.toFixed(6) + ',' + points[j].lat.toFixed(6));
                         }
                     }else{
                         for(var j = 0; j<points.length-1; j++) {
-                            innerArray.push(points.getAt(j).lat().toFixed(6) + ',' + points.getAt(j).lng().toFixed(6));
-                            innerArrayKml.push(points.getAt(j).lng().toFixed(6) + ',' + points.getAt(j).lat().toFixed(6));
+                            innerArray.push(points[j].lat.toFixed(6) + ',' + points[j].lng.toFixed(6));
+                            innerArrayKml.push(points[j].lng.toFixed(6) + ',' + points[j].lat.toFixed(6));
                         }
                     }
                     innerArrays.push(innerArray);
@@ -955,20 +933,18 @@ function addpolyShapelistener() {
                 if (codeID == 1) logCode3();
                 if (codeID == 2) logCode5(); // write Google javascript
             }
-            tinyMarker = new google.maps.Marker({
-                position: placemarks[plmcur].point,
-                map: map,
+            tinyMarker = new BMap.Marker(placemarks[plmcur].point, {
                 icon: tinyIcon
             });
             closethis('polygonstuff');
         });
     }
     if (toolID == 3) {
-        google.maps.event.addListener(rectangle, 'click', function (point) {
+        rectangle.addEventListener('click', function (point) {
             gob('EditButton').disabled = 'disabled';
-            if (tinyMarker) tinyMarker.setMap(null);
-            if (startMarker) startMarker.setMap(null);
-            if (nemarker) nemarker.setMap(null);
+            if (tinyMarker) map.removeOverlay(tinyMarker);
+            if (startMarker) map.removeOverlay(startMarker);
+            if (nemarker) map.removeOverlay(nemarker);
             directionsYes = 0;
             rectangle = placemarks[thisshape].shape;
             plmcur = thisshape;
@@ -979,22 +955,20 @@ function addpolyShapelistener() {
             var latlongs = rectangle.getBounds();
             var southwest = latlongs.getSouthWest();
             var northeast = latlongs.getNorthEast();
-            startMarker = new google.maps.Marker({
-                position: southwest,
+            startMarker = new BMap.Marker(southwest, {
                 draggable: true,
                 raiseOnDrag: false,
-                title: "Draggable",
-                map: map
+                title: "Draggable"
             });
-            nemarker = new google.maps.Marker({
-                position: northeast,
+            map.addOverlay(startMarker);
+            nemarker = new BMap.Marker(northeast, {
                 draggable: true,
                 raiseOnDrag: false,
-                title: "Draggable",
-                map: map
+                title: "Draggable"
             });
-            google.maps.event.addListener(startMarker, 'dragend', drawRectangle);
-            google.maps.event.addListener(nemarker, 'dragend', drawRectangle);
+            map.addOverlay(nemarker);
+            startMarker.addEventListener('dragend', drawRectangle);
+            nemarker.addEventListener('dragend', drawRectangle);
             if (codeID == 1) logCode2();
             if (codeID == 2) logCode6(); // write Google javascript
             closethis('polygonstuff');
@@ -1004,13 +978,13 @@ function addpolyShapelistener() {
 // Clear current Map
 function clearMap(full) {
     if (editing == true) stopediting();
-    if (polyShape) polyShape.setMap(null); // polyline or polygon
-    if (outerShape) outerShape.setMap(null);
-    if (rectangle) rectangle.setMap(null);
-    if (circle) circle.setMap(null);
+    if (polyShape) map.removeOverlay(polyShape); // polyline or polygon
+    if (outerShape) map.removeOverlay(outerShape);
+    if (rectangle) map.removeOverlay(rectangle);
+    if (circle) map.removeOverlay(circle);
     if (drawnShapes.length > 0) {
         for (var i = 0; i < drawnShapes.length; i++) {
-            drawnShapes[i].setMap(null);
+            map.removeOverlay(drawnShapes[i]);
         }
     }
     plmcur = 0;
@@ -1059,10 +1033,9 @@ function newstart(full) {
     closethis('polygonoptions');
     closethis('circleoptions');
     if (toolID != 2) closethis('polygonstuff');
-    if (directionsDisplay) directionsDisplay.setMap(null);
-    if (startMarker) startMarker.setMap(null);
-    if (nemarker) nemarker.setMap(null);
-    if (tinyMarker) tinyMarker.setMap(null);
+    if (startMarker) map.removeOverlay(startMarker);
+    if (nemarker) map.removeOverlay(nemarker);
+    if (tinyMarker) map.removeOverlay(tinyMarker);
     if (toolID == 1) {
         placemarks[plmcur].style = polylinestyles[polylinestyles.length - 1].name;
         placemarks[plmcur].stylecur = polylinestyles.length - 1;
@@ -1127,7 +1100,8 @@ function deleteLastPoint() {
         if (polyShape) {
             polyPoints = polyShape.getPath();
             if (polyPoints.length > 0) {
-                polyPoints.removeAt(polyPoints.length - 1);
+                polyPoints.splice(polyPoints.length - 1, 1);
+                polyShape.setPath(polyPoints);
                 pointsArrayKml.pop();
                 pointsArray.pop();
                 if (codeID == 1) logCode1();
@@ -1139,18 +1113,19 @@ function deleteLastPoint() {
         if (innerArrayKml.length > 0) {
             innerArrayKml.pop();
             innerArray.pop();
-            polyPoints.removeAt(polyPoints.length - 1);
+            polyPoints.splice(polyPoints.length - 1, 1);
         }
         if (outerArrayKml.length > 0 && innerArrayKml.length == 0) {
             outerArrayKml.pop();
             outerArray.pop();
-            //polyPoints.removeAt(polyPoints.length-1);
+            //polyPoints.splice(polyPoints.length - 1, 1);
         }
         if (outerPoints.length === 0) {
             if (polyShape) {
                 polyPoints = polyShape.getPath();
                 if (polyPoints.length > 0) {
-                    polyPoints.removeAt(polyPoints.length - 1);
+                    polyPoints.splice(polyPoints.length - 1, 1);
+                    polyShape.setPath(polyPoints);
                     pointsArrayKml.pop();
                     pointsArray.pop();
                     if (adder == 0) {
@@ -1174,8 +1149,8 @@ function holecreator() {
             adder = 0;
             return;
         } else {
-            if (startMarker) startMarker.setMap(null);
-            if (polyShape) polyShape.setMap(null);
+            if (startMarker) map.removeOverlay(startMarker);
+            if (polyShape) map.removeOverlay(polyShape);
             polyPoints = [];
             preparePolyline();
             //gob('stepdiv').innerHTML = "Step 1";
@@ -1188,7 +1163,7 @@ function holecreator() {
         // innerArray and innerArrayKml will be collected in function addLatLng
         if (anotherhole == false) {
             // outer line is finished, in Polyline draw mode
-            polyPoints.insertAt(polyPoints.length, startpoint); // let start and end for outer line meet
+            polyPoints.push(startpoint); // let start and end for outer line meet
             outerPoints = polyPoints; // store polyPoints in outerPoints. polyPoints will be reused for inner lines
             holePolyArray.push(outerPoints); // this will be the points array for polygon with hole when the points for inner lines are added
             outerShape = polyShape; // store polyShape in outerShape. polyShape will be reused for inner lines
@@ -1199,11 +1174,11 @@ function holecreator() {
         if (anotherhole == true) { // set to true in nexthole
             // a hole has been drawn, another is about to be drawn
             if (polyShape && polyPoints.length == 0) {
-                polyShape.setMap(null);
+                map.removeOverlay(polyShape);
                 /*gob('eGaaSCoords').value = 'Oops! Not programmed yet, but you may continue drawing holes. '+
                 'Everything you have created will show up when you click Hole again.';*/
             } else {
-                polyPoints.insertAt(polyPoints.length, startpoint);
+                polyPoints.push(startpoint);
                 holePolyArray.push(polyPoints);
                 if (innerArray.length > 0) innerArrays.push(innerArray);
                 if (innerArrayKml.length > 0) innerArraysKml.push(innerArrayKml);
@@ -1214,12 +1189,12 @@ function holecreator() {
         }
         polyPoints = [];
         preparePolyline();
-        if (startMarker) startMarker.setMap(null);
+        if (startMarker) map.removeOverlay(startMarker);
     }
     if (holestep == 3) {
-        if (startMarker) startMarker.setMap(null);
-        if (outerShape) outerShape.setMap(null);
-        if (polyShape) polyShape.setMap(null);
+        if (startMarker) map.removeOverlay(startMarker);
+        if (outerShape) map.removeOverlay(outerShape);
+        if (polyShape) map.removeOverlay(polyShape);
         if (polyPoints.length > 0) holePolyArray.push(polyPoints);
         if (innerArray.length > 0) innerArrays.push(innerArray);
         if (innerArrayKml.length > 0) innerArraysKml.push(innerArrayKml);
@@ -1233,30 +1208,26 @@ function holecreator() {
 function drawpolywithhole() {
     if (holeShapes.length > 0) {
         for (var i = 0; i < holeShapes.length; i++) {
-            holeShapes[i].setMap(null);
+            map.removeOverlay(holeShapes[i]);
         }
     }
-    var Points = new google.maps.MVCArray(holePolyArray);
     var polyOptions = {
-        paths: Points,
         strokeColor: polygonstyles[pcur].color,
         strokeOpacity: polygonstyles[pcur].lineopac,
         strokeWeight: polygonstyles[pcur].width,
         fillColor: polygonstyles[pcur].fill,
         fillOpacity: polygonstyles[pcur].fillopac
     };
-    polyShape = new google.maps.Polygon(polyOptions);
-    polyShape.setMap(map);
+    polyShape = new BMap.Polygon(holePolyArray, polyOptions);
+    map.addOverlay(polyShape);
     //Cursor position, when inside polyShape, is registered with this listener
     cursorposition(polyShape);
     anotherhole = false;
-    if (startMarker) startMarker.setMap(null);
-    startMarker = new google.maps.Marker({
-        position: outerPoints.getAt(0),
-        map: map
-    });
+    if (startMarker) map.removeOverlay(startMarker);;
+    startMarker = new BMap.Marker(outerPoints[0], {});
     startMarker.setTitle("Polygon with hole");
-    placemarks[plmcur].point = outerPoints.getAt(0);
+    map.addOverlay(startMarker);
+    placemarks[plmcur].point = outerPoints[0];
 }
 // Called from button 'Next hole' in div 'polygonstuff'
 function nexthole() {
@@ -1282,24 +1253,24 @@ function stopediting() {
         innerArrayKml = [];
         innerArraysKml = [];
         var polly = polyShape.getPaths();
-        polyPoints = polly.getAt(0);
-        var points = polly.getAt(0);
-        //alert(point.lng().toFixed(6));
+        polyPoints = polly[0];
+        var points = polly[0];
+        //alert(point.lng.toFixed(6));
         for (var i = 0; i < points.length - 1; i++) {
-            outerArray.push(points.getAt(i).lat().toFixed(6) + ',' + points.getAt(i).lng().toFixed(6));
-            outerArrayKml.push(points.getAt(i).lng().toFixed(6) + ',' + points.getAt(i).lat().toFixed(6));
+            outerArray.push(point[i].lat.toFixed(6) + ',' + points[i].lng.toFixed(6));
+            outerArrayKml.push(points[i].lng.toFixed(6) + ',' + points[i].lat.toFixed(6));
         }
         for (i = 1; i < polly.length; i++) {
-            points = polly.getAt(i);
+            points = polly[i];
             if (i == polly.length - 1) {
                 for (var j = 0; j < points.length; j++) {
-                    innerArray.push(points.getAt(j).lat().toFixed(6) + ',' + points.getAt(j).lng().toFixed(6));
-                    innerArrayKml.push(points.getAt(j).lng().toFixed(6) + ',' + points.getAt(j).lat().toFixed(6));
+                    innerArray.push(points[j].lat.toFixed(6) + ',' + points[j].lng.toFixed(6));
+                    innerArrayKml.push(points[j].lng.toFixed(6) + ',' + points[j].lat.toFixed(6));
                 }
             } else {
                 for (var j = 0; j < points.length - 1; j++) {
-                    innerArray.push(points.getAt(j).lat().toFixed(6) + ',' + points.getAt(j).lng().toFixed(6));
-                    innerArrayKml.push(points.getAt(j).lng().toFixed(6) + ',' + points.getAt(j).lat().toFixed(6));
+                    innerArray.push(points[j].lat.toFixed(6) + ',' + points[j].lng.toFixed(6));
+                    innerArrayKml.push(points[j].lng.toFixed(6) + ',' + points[j].lat.toFixed(6));
                 }
             }
             innerArrays.push(innerArray);
@@ -1314,10 +1285,10 @@ function stopediting() {
         if (codeID == 2) logCode5(); // write Google javascript
     } else {
         for (var i = 0; i < markers.length; i++) {
-            markers[i].setMap(null);
+            map.removeOverlay(markers[i]);
         }
         for (var i = 0; i < midmarkers.length; i++) {
-            midmarkers[i].setMap(null);
+            map.removeOverlay(midmarkers[i]);
         }
         polyPoints = polyShape.getPath();
         markers = [];
@@ -1327,7 +1298,7 @@ function stopediting() {
             drawnShapes.push(polyShape);
             addpolyShapelistener();
         }
-        //setstartMarker(polyPoints.getAt(0));
+        //setstartMarker(polyPoints[0]);
     }
 }
 // the "Edit lines" button has been pressed
@@ -1344,16 +1315,16 @@ function editlines() {
                 showthis('RegretButton');
                 toolID = gob('toolchoice').value = 1; // editing is set to be possible only in polyline draw mode
                 setTool();
-                if (startMarker) startMarker.setMap(null);
+                if (startMarker) map.removeOverlay(startMarker);
                 /*polyShape.setOptions({
                     editable: true
                 });*/
                 for (var i = 0; i < polyPoints.length; i++) {
-                    var marker = setmarkers(polyPoints.getAt(i));
+                    var marker = setmarkers(polyPoints[i]);
                     markers.push(marker);
                     if (i > 0) {
-                        var previous = polyPoints.getAt(i - 1);
-                        var midmarker = setmidmarkers(polyPoints.getAt(i), previous);
+                        var previous = polyPoints[i - 1];
+                        var midmarker = setmidmarkers(polyPoints[i], previous);
                         midmarkers.push(midmarker);
                     }
                 }
@@ -1366,12 +1337,12 @@ function editlines() {
 function regret() {
     if (polyPoints.length == 0) return;
     for (var i = 0; i < markers.length; i++) {
-        markers[i].setMap(null);
+        map.removeOverlay(markers[i]);
     }
     for (var i = 0; i < midmarkers.length; i++) {
-        midmarkers[i].setMap(null);
+        map.removeOverlay(midmarkers[i]);
     }
-    polyPoints.insertAt(prevnumber, prevpoint);
+    polyPoints.splice(prevnumber, 0, prevpoint);
     polyShape.setPath(polyPoints);
     //editing = false;
     stopediting();
@@ -1379,20 +1350,18 @@ function regret() {
 }
 // Called from editlines and listener set in setmidmarkers
 function setmarkers(point) {
-    var marker = new google.maps.Marker({
-        position: point,
-        map: map,
+    var marker = new BMap.Marker(point, {
         icon: imageNormal,
         raiseOnDrag: false,
         draggable: true
     });
-    google.maps.event.addListener(marker, "mouseover", function () {
+    marker.addEventListener("mouseover", function () {
         marker.setIcon(imageHover);
     });
-    google.maps.event.addListener(marker, "mouseout", function () {
+    marker.addEventListener("mouseout", function () {
         marker.setIcon(imageNormal);
     });
-    google.maps.event.addListener(marker, "drag", function () {
+    marker.addEventListener("drag", function () {
         for (var i = 0; i < markers.length; i++) {
             if (markers[i] == marker) {
                 prevpoint = marker.getPosition();
@@ -1403,20 +1372,20 @@ function setmarkers(point) {
             }
         }
         polyPoints = polyShape.getPath();
-        var stringtobesaved = '"' + marker.getPosition().lat().toFixed(6) + '","' + marker.getPosition().lng().toFixed(6) + '"';
-        var kmlstringtobesaved = '"' + marker.getPosition().lng().toFixed(6) + '","' + marker.getPosition().lat().toFixed(6) + '"';
+        var stringtobesaved = '"' + marker.getPosition().lat.toFixed(6) + '","' + marker.getPosition().lng.toFixed(6) + '"';
+        var kmlstringtobesaved = '"' + marker.getPosition().lng.toFixed(6) + '","' + marker.getPosition().lat.toFixed(6) + '"';
         pointsArray.splice(i, 1, stringtobesaved);
         pointsArrayKml.splice(i, 1, kmlstringtobesaved);
         logCode1();
     });
-    google.maps.event.addListener(marker, "click", function () {
+    marker.addEventListener("click", function () {
         for (var i = 0; i < markers.length; i++) {
             if (markers[i] == marker && markers.length != 1) {
                 prevpoint = marker.getPosition();
                 prevnumber = i;
-                marker.setMap(null);
+                map.removeOverlay(marker);
                 markers.splice(i, 1);
-                polyShape.getPath().removeAt(i);
+                polyShape.getPath().splice(i, 1);
                 removemidmarker(i);
                 break;
             }
@@ -1433,23 +1402,22 @@ function setmarkers(point) {
 // Called from editlines and listener set in this function
 function setmidmarkers(point, prevpoint) {
     //var prevpoint = markers[markers.length-2].getPosition();
-    var marker = new google.maps.Marker({
-        position: new google.maps.LatLng(
-            point.lat() - (0.5 * (point.lat() - prevpoint.lat())),
-            point.lng() - (0.5 * (point.lng() - prevpoint.lng()))
-        ),
-        map: map,
+    var position = new BMap.Point(
+        point.lng - (0.5 * (point.lng - prevpoint.lng)),
+        point.lat - (0.5 * (point.lat - prevpoint.lat))
+    );
+    var marker = new BMap.Marker(position, {
         icon: imageNormalMidpoint,
         raiseOnDrag: false,
         draggable: true
     });
-    google.maps.event.addListener(marker, "mouseover", function () {
+    marker.addEventListener("mouseover", function () {
         marker.setIcon(imageHover);
     });
-    google.maps.event.addListener(marker, "mouseout", function () {
+    marker.addEventListener("mouseout", function () {
         marker.setIcon(imageNormalMidpoint);
     });
-    google.maps.event.addListener(marker, "dragstart", function () {
+    marker.addEventListener("dragstart", function () {
         for (var i = 0; i < midmarkers.length; i++) {
             if (midmarkers[i] == marker) {
                 var tmpPath = tmpPolyLine.getPath();
@@ -1460,7 +1428,7 @@ function setmidmarkers(point, prevpoint) {
             }
         }
     });
-    google.maps.event.addListener(marker, "drag", function () {
+    marker.addEventListener("drag", function () {
         for (var i = 0; i < midmarkers.length; i++) {
             if (midmarkers[i] == marker) {
                 tmpPolyLine.getPath().setAt(1, marker.getPosition());
@@ -1468,30 +1436,30 @@ function setmidmarkers(point, prevpoint) {
             }
         }
     });
-    google.maps.event.addListener(marker, "dragend", function () {
+    marker.addEventListener("dragend", function () {
         for (var i = 0; i < midmarkers.length; i++) {
             if (midmarkers[i] == marker) {
                 var newpos = marker.getPosition();
                 var startMarkerPos = markers[i].getPosition();
-                var firstVPos = new google.maps.LatLng(
-                    newpos.lat() - (0.5 * (newpos.lat() - startMarkerPos.lat())),
-                    newpos.lng() - (0.5 * (newpos.lng() - startMarkerPos.lng()))
+                var firstVPos = new BMap.Point(
+                    newpos.lng - (0.5 * (newpos.lng - startMarkerPos.lng)),
+                    newpos.lat - (0.5 * (newpos.lat - startMarkerPos.lat))
                 );
                 var endMarkerPos = markers[i + 1].getPosition();
-                var secondVPos = new google.maps.LatLng(
-                    newpos.lat() - (0.5 * (newpos.lat() - endMarkerPos.lat())),
-                    newpos.lng() - (0.5 * (newpos.lng() - endMarkerPos.lng()))
+                var secondVPos = new BMap.Point(
+                    newpos.lng - (0.5 * (newpos.lng - endMarkerPos.lng)),
+                    newpos.lat - (0.5 * (newpos.lat - endMarkerPos.lat))
                 );
                 var newVMarker = setmidmarkers(secondVPos, startMarkerPos);
                 newVMarker.setPosition(secondVPos);//apply the correct position to the midmarker
                 var newMarker = setmarkers(newpos);
                 markers.splice(i + 1, 0, newMarker);
-                polyShape.getPath().insertAt(i + 1, newpos);
+                polyShape.splice(i + 1, 0, newpos);
                 marker.setPosition(firstVPos);
                 midmarkers.splice(i + 1, 0, newVMarker);
-                tmpPolyLine.getPath().removeAt(2);
-                tmpPolyLine.getPath().removeAt(1);
-                tmpPolyLine.getPath().removeAt(0);
+                tmpPolyLine.getPath().splice(2, 1);
+                tmpPolyLine.getPath().splice(1, 1);
+                tmpPolyLine.getPath().splice(1, 1);
     			/*newpos = null;
     			startMarkerPos = null;
     			firstVPos = null;
@@ -1503,8 +1471,8 @@ function setmidmarkers(point, prevpoint) {
             }
         }
         polyPoints = polyShape.getPath();
-        var stringtobesaved = '"' + newpos.lat().toFixed(6) + '","' + newpos.lng().toFixed(6) + '"';
-        var kmlstringtobesaved = '"' + newpos.lng().toFixed(6) + '","' + newpos.lat().toFixed(6) + '"';
+        var stringtobesaved = '"' + newpos.lat.toFixed(6) + '","' + newpos.lng.toFixed(6) + '"';
+        var kmlstringtobesaved = '"' + newpos.lng.toFixed(6) + '","' + newpos.lat.toFixed(6) + '"';
         pointsArray.splice(i + 1, 0, stringtobesaved);
         pointsArrayKml.splice(i + 1, 0, kmlstringtobesaved);
         logCode1();
@@ -1516,17 +1484,17 @@ function movemidmarker(index) {
     var newpos = markers[index].getPosition();
     if (index != 0) {
         var prevpos = markers[index - 1].getPosition();
-        midmarkers[index - 1].setPosition(new google.maps.LatLng(
-            newpos.lat() - (0.5 * (newpos.lat() - prevpos.lat())),
-            newpos.lng() - (0.5 * (newpos.lng() - prevpos.lng()))
+        midmarkers[index - 1].setPosition(new BMap.Point(
+            newpos.lng - (0.5 * (newpos.lng - prevpos.lng)),
+            newpos.lat - (0.5 * (newpos.lat - prevpos.lat))
         ));
         //prevpos = null;
     }
     if (index != markers.length - 1) {
         var nextpos = markers[index + 1].getPosition();
-        midmarkers[index].setPosition(new google.maps.LatLng(
-            newpos.lat() - (0.5 * (newpos.lat() - nextpos.lat())),
-            newpos.lng() - (0.5 * (newpos.lng() - nextpos.lng()))
+        midmarkers[index].setPosition(new BMap.Point(
+            newpos.lng - (0.5 * (newpos.lng - nextpos.lng)),
+            newpos.lat - (0.5 * (newpos.lat - nextpos.lat))
         ));
         //nextpos = null;
     }
@@ -1537,19 +1505,19 @@ function movemidmarker(index) {
 function removemidmarker(index) {
     if (markers.length > 0) {//clicked marker has already been deleted
         if (index != markers.length) {
-            midmarkers[index].setMap(null);
+            map.removeOverlay(midmarkers[index]);
             midmarkers.splice(index, 1);
         } else {
-            midmarkers[index - 1].setMap(null);
+            map.removeOverlay(midmarkers[index - 1]);
             midmarkers.splice(index - 1, 1);
         }
     }
     if (index != 0 && index != markers.length) {
         var prevpos = markers[index - 1].getPosition();
         var newpos = markers[index].getPosition();
-        midmarkers[index - 1].setPosition(new google.maps.LatLng(
-            newpos.lat() - (0.5 * (newpos.lat() - prevpos.lat())),
-            newpos.lng() - (0.5 * (newpos.lng() - prevpos.lng()))
+        midmarkers[index - 1].setPosition(new BMap.Point(
+            newpos.lng - (0.5 * (newpos.lng - nextpos.lng)),
+            newpos.lat - (0.5 * (newpos.lat - prevpos.lat))
         ));
         //prevpos = null;
         //newpos = null;
@@ -1568,22 +1536,37 @@ function showKML() {
     gob('eGaaSCoords').value += kmlend();
 }
 function showAddress(address) {
-    geocoder.geocode({ 'address': address }, function (results, status) {
-        if (status == google.maps.GeocoderStatus.OK) {
-            var pos = results[0].geometry.location;
+    var encodedAddress = encodeURIComponent(address);
+    var url = 'http://api.map.baidu.com/geocoder/v2/?output=json&address=' + encodedAddress + '&ak=27c88c00210c334dcad9c787e132d3df';
+    $.get(url, function(result) {
+        if (result.status === 0) {
+            var pos = new BMap.Point(result.result.location.lng, result.result.location.lat);
             map.setCenter(pos);
-            tinyMarker = new google.maps.Marker({
-                position: pos,
-                map: map,
+            tinyMarker = new BMap.Marker(pos, {
                 icon: tinyIcon
             });
+            map.addOverlay(tinyMarker);
             drawnShapes.push(tinyMarker);
             if (directionsYes == 1) drawDirections(pos);
             if (toolID == 5) drawMarkers(pos);
         } else {
-            alert("Geocode was not successful for the following reason: " + status);
+            alert(result.msg);
         }
-    });
+    }, 'jsonp');
+}
+function getMapGeocode(coords, callback) {
+    var lat = coords.cords[0][0];
+    var lng = coords.cords[0][1];
+    var url = 'http://api.map.baidu.com/geocoder/v2/?location=' + lat + ',' + lng + '&output=json&ak=27c88c00210c334dcad9c787e132d3df';
+    $.get(url, function(response) {
+        if (response.status === 0) {
+            if (response.result.formatted_address) {
+                callback(response.result.formatted_address);
+            }
+        } else {
+            alert(response.msg);
+        }
+    }, 'jsonp');
 }
 function activateDirections() {
     directionsYes = 1;
@@ -1670,9 +1653,9 @@ function mapzoom() {
 }
 function mapcenter() {
     var mapCenter = map.getCenter();
-    var wrapped = new google.maps.LatLng(mapCenter.lat(), mapCenter.lng());
-    var latLngStr = '"' + wrapped.lat().toFixed(6) + '","' + wrapped.lng().toFixed(6) + '"';
-    //var latLngStr = mapCenter.lat().toFixed(6) + ', ' + mapCenter.lng().toFixed(6);
+    var wrapped = new BMap.Point(mapCenter.lng, mapCenter.lat);
+    var latLngStr = '"' + wrapped.lat.toFixed(6) + '","' + wrapped.lng.toFixed(6) + '"';
+    //var latLngStr = mapCenter.lat.toFixed(6) + ', ' + mapCenter.lng.toFixed(6);
     gob("centerofmap").value = latLngStr;
 }
 function showCodeintextarea() {
@@ -1838,7 +1821,7 @@ function polylinestyle(e) { //save style
         placemarks[plmcur].stylecur = lcur;
     }
     gob("stylenumberl").innerHTML = (lcur + 1) + ' ';
-    if (polyShape) polyShape.setMap(null);
+    if (polyShape) map.removeOverlay(polyShape);
     preparePolyline();
     if (directionsYes == 1) {
         toolID = 6;
@@ -1883,8 +1866,8 @@ function polygonstyle(e) {
     placemarks[plmcur].style = polygonstyles[pcur].name;
     placemarks[plmcur].stylecur = pcur;
     gob("stylenumberp").innerHTML = (pcur + 1) + ' ';
-    if (polyShape) polyShape.setMap(null);
-    if (outerShape) outerShape.setMap(null);
+    if (polyShape) map.removeOverlay(polyShape);
+    if (outerShape) map.removeOverlay(outerShape);
     if (holePolyArray.length > 0) {
         drawpolywithhole();
         if (codeID == 1) logCode3();
@@ -1925,7 +1908,7 @@ function circlestyle(e) {
     placemarks[plmcur].style = circlestyles[ccur].name;
     placemarks[plmcur].stylecur = ccur;
     gob("stylenumberc").innerHTML = (ccur + 1) + ' ';
-    if (circle) circle.setMap(null);
+    if (circle) map.removeOverlay(circle);
     activateCircle();
     if (radiusPoint) {
         drawCircle();
@@ -1995,7 +1978,7 @@ function stepstyles(a) {
             placemarks[plmcur].style = polylinestyles[lcur].name;
             placemarks[plmcur].stylecur = lcur;
         }
-        if (polyShape) polyShape.setMap(null);
+        if (polyShape) map.removeOverlay(polyShape);
         preparePolyline();
         if (directionsYes == 1) {
             toolID = 6;
@@ -2028,7 +2011,7 @@ function stepstyles(a) {
         placemarks[plmcur].stylecur = pcur;
         if (polyShape) {
             //alert("polyShape");
-            polyShape.setMap(null);
+            map.removeOverlay(polyShape);
             preparePolygon();
             if (polyPoints.length) {
                 if (codeID == 1) logCode2();
@@ -2037,7 +2020,7 @@ function stepstyles(a) {
         }
         /*if(rectangle) {
             //alert("polyShape");
-            rectangle.setMap(null);
+            map.removeOverlay(rectangle);
             activateRectangle();
             if(polyPoints.length) {
                 if(codeID == 1) logCode2();
@@ -2062,7 +2045,7 @@ function stepstyles(a) {
         }
         placemarks[plmcur].style = circlestyles[ccur].name;
         placemarks[plmcur].stylecur = ccur;
-        if (circle) circle.setMap(null);
+        if (circle) map.removeOverlay(circle);
         activateCircle();
         if (radiusPoint) {
             logCode7();
@@ -2254,30 +2237,28 @@ function logCode4() {
     gob('eGaaSCoords').value = '';
     for (var i = 0; i < pointsArray.length; i++) {
         if (i == pointsArray.length - 1) {
-            //gob('eGaaSCoords').value += 'new google.maps.LatLng('+pointsArray[i] + ')\n';
+            //gob('eGaaSCoords').value += 'new BMap.Point('+pointsArray[i] + ')\n';
             gob('eGaaSCoords').value += '[' + pointsArray[i] + ']';
         } else {
-            //gob('eGaaSCoords').value += 'new google.maps.LatLng('+pointsArray[i] + '),\n';
+            //gob('eGaaSCoords').value += 'new BMap.Point('+pointsArray[i] + '),\n';
             gob('eGaaSCoords').value += '[' + pointsArray[i] + '],';
         }
     }
     if (toolID == 1) {
         gob('eGaaSCoords').value += '];\n';
         var options = 'var polyOptions = {\n'
-            + 'path: myCoordinates,\n'
             + 'strokeColor: "' + polylinestyles[lcur].color + '",\n'
             + 'strokeOpacity: ' + polylinestyles[lcur].lineopac + ',\n'
             + 'strokeWeight: ' + polylinestyles[lcur].width + '\n'
             + '}\n';
         gob('eGaaSCoords').value += options;
-        gob('eGaaSCoords').value += 'var it = new google.maps.Polyline(polyOptions);\n'
-            + 'it.setMap(map);\n';
+        gob('eGaaSCoords').value += 'var it = new BMap.Polyline(myCoordinates, polyOptions);\n'
+            + 'map.addOverlay(it);\n';
         placemarks[plmcur].poly = "pl";
     }
     if (toolID == 2) {
         gob('eGaaSCoords').value += '';/* += '];\n';
         var options = 'var polyOptions = {\n'
-        +'path: myCoordinates,\n'
         +'strokeColor: "'+polygonstyles[pcur].color+'",\n'
         +'strokeOpacity: '+polygonstyles[pcur].lineopac+',\n'
         +'strokeWeight: '+polygonstyles[pcur].width+',\n'
@@ -2285,8 +2266,8 @@ function logCode4() {
         +'fillOpacity: '+polygonstyles[pcur].fillopac+'\n'
         +'}\n';
         gob('eGaaSCoords').value += options;
-        gob('eGaaSCoords').value +='var it = new google.maps.Polygon(polyOptions);\n'
-        +'it.setMap(map);\n';
+        gob('eGaaSCoords').value +='var it = new BMap.Polygon(myCoordinates, polyOptions);\n'
+        +'map.addOverlay(it);\n';
         placemarks[plmcur].poly = "pg";*/
     }
     javacode = gob('eGaaSCoords').value;
@@ -2298,9 +2279,9 @@ function logCode5() {
     gob('eGaaSCoords').value = 'var outerPoints = [\n';
     for (var i = 0; i < outerArray.length; i++) {
         if (i == outerArray.length - 1) {
-            gob('eGaaSCoords').value += 'new google.maps.LatLng(' + outerArray[i] + ')\n'; // without trailing comma
+            gob('eGaaSCoords').value += 'new BMap.Point(' + outerArray[i] + ')\n'; // without trailing comma
         } else {
-            gob('eGaaSCoords').value += 'new google.maps.LatLng(' + outerArray[i] + '),\n';
+            gob('eGaaSCoords').value += 'new BMap.Point(' + outerArray[i] + '),\n';
         }
     }
     gob('eGaaSCoords').value += '];\n';
@@ -2311,24 +2292,23 @@ function logCode5() {
         hstring += holestring;
         for (i = 0; i < innerArrays[m].length; i++) {
             if (i == innerArrays[m].length - 1) {
-                gob('eGaaSCoords').value += 'new google.maps.LatLng(' + innerArrays[m][i] + ')\n';
+                gob('eGaaSCoords').value += 'new BMap.Point(' + innerArrays[m][i] + ')\n';
             } else {
-                gob('eGaaSCoords').value += 'new google.maps.LatLng(' + innerArrays[m][i] + '),\n';
+                gob('eGaaSCoords').value += 'new BMap.Point(' + innerArrays[m][i] + '),\n';
             }
         }
         gob('eGaaSCoords').value += '];\n';
     }
     gob('eGaaSCoords').value += 'var myCoordinates = [outerPoints,' + hstring + '];\n';
     gob('eGaaSCoords').value += 'var polyOptions = {\n'
-        + 'paths: myCoordinates,\n'
         + 'strokeColor: "' + polygonstyles[pcur].color + '",\n'
         + 'strokeOpacity: ' + polygonstyles[pcur].lineopac + ',\n'
         + 'strokeWeight: ' + polygonstyles[pcur].width + ',\n'
         + 'fillColor: "' + polygonstyles[pcur].fill + '",\n'
         + 'fillOpacity: ' + polygonstyles[pcur].fillopac + '\n'
         + '};\n'
-        + 'var it = new google.maps.Polygon(polyOptions);\n'
-        + 'it.setMap(map);\n';
+        + 'var it = new BMap.Polygon(myCoordinates, polyOptions);\n'
+        + 'map.addOverlay(it);\n';
     placemarks[plmcur].poly = "pgh";
     javacode = gob('eGaaSCoords').value;
 }
@@ -2337,35 +2317,33 @@ function logCode6() {
     if (notext === true) return;
     //placemarks[plmcur].style = polygonstyles[pcur].name;
     if (codeID == 2) { // javascript
-        gob('eGaaSCoords').value = 'var rectangle = new google.maps.Rectangle({\n'
-            + 'map: map,\n'
+        gob('eGaaSCoords').value = 'var rectangle = new BMap.Polygon([], {\n'
             + 'fillColor: ' + polygonstyles[pcur].fill + ',\n'
             + 'fillOpacity: ' + polygonstyles[pcur].fillopac + ',\n'
             + 'strokeColor: ' + polygonstyles[pcur].color + ',\n'
             + 'strokeOpacity: ' + polygonstyles[pcur].lineopac + ',\n'
             + 'strokeWeight: ' + polygonstyles[pcur].width + '\n'
             + '});\n';
-        gob('eGaaSCoords').value += 'var sWest = new google.maps.LatLng(' + southWest.lat().toFixed(6) + ',' + southWest.lng().toFixed(6) + ');\n'
-            + 'var nEast = new google.maps.LatLng(' + northEast.lat().toFixed(6) + ',' + northEast.lng().toFixed(6) + ');\n'
-            + 'var bounds = new google.maps.LatLngBounds(sWest,nEast);\n'
-            + 'rectangle.setBounds(bounds);\n';
+        gob('eGaaSCoords').value += 'var sWest = new BMap.Point(' + southWest.lng.toFixed(6) + ',' + southWest.lat.toFixed(6) + ');\n'
+            + 'var nEast = new BMap.Point(' + northEast.lng.toFixed(6) + ',' + northEast.lat.toFixed(6) + ');\n'
+            + 'var bounds = new BMap.Bounds(sWest,nEast);\n'
+            + 'setRectangleBounds(rectangle, bounds);;\n';
         gob('eGaaSCoords').value += '\n\\\\ Code for polyline rectangle\n';
         gob('eGaaSCoords').value += 'var myCoordinates = [\n';
-        gob('eGaaSCoords').value += southWest.lat().toFixed(6) + ',' + southWest.lng().toFixed(6) + ',\n' +
-            southWest.lat().toFixed(6) + ',' + northEast.lng().toFixed(6) + ',\n' +
-            northEast.lat().toFixed(6) + ',' + northEast.lng().toFixed(6) + ',\n' +
-            northEast.lat().toFixed(6) + ',' + southWest.lng().toFixed(6) + ',\n' +
-            southWest.lat().toFixed(6) + ',' + southWest.lng().toFixed(6) + '\n';
+        gob('eGaaSCoords').value += southWest.lat.toFixed(6) + ',' + southWest.lng.toFixed(6) + ',\n' +
+            southWest.lat.toFixed(6) + ',' + northEast.lng.toFixed(6) + ',\n' +
+            northEast.lat.toFixed(6) + ',' + northEast.lng.toFixed(6) + ',\n' +
+            northEast.lat.toFixed(6) + ',' + southWest.lng.toFixed(6) + ',\n' +
+            southWest.lat.toFixed(6) + ',' + southWest.lng.toFixed(6) + '\n';
         gob('eGaaSCoords').value += '];\n';
         var options = 'var polyOptions = {\n'
-            + 'path: myCoordinates,\n'
             + 'strokeColor: "' + polygonstyles[pcur].color + '",\n'
             + 'strokeOpacity: ' + polygonstyles[pcur].lineopac + ',\n'
             + 'strokeWeight: ' + polygonstyles[pcur].width + '\n'
             + '}\n';
         gob('eGaaSCoords').value += options;
-        gob('eGaaSCoords').value += 'var it = new google.maps.Polyline(polyOptions);\n'
-            + 'it.setMap(map);\n';
+        gob('eGaaSCoords').value += 'var it = new BMap.Polyline(myCoopolyOptions, polyOptions);\n'
+            + 'map.addOverlay(it);\n';
         javacode = gob('eGaaSCoords').value;
     }
     if (codeID == 1) { // kml
@@ -2375,11 +2353,11 @@ function logCode6() {
             '<Polygon>\n<tessellate>' + placemarks[plmcur].tess + '</tessellate>\n' +
             '<altitudeMode>' + placemarks[plmcur].alt + '</altitudeMode>\n' +
             '<outerBoundaryIs><LinearRing><coordinates>\n';
-        kmltext += southWest.lng().toFixed(6) + ',' + southWest.lat().toFixed(6) + ',0.0 \n' +
-            southWest.lng().toFixed(6) + ',' + northEast.lat().toFixed(6) + ',0.0 \n' +
-            northEast.lng().toFixed(6) + ',' + northEast.lat().toFixed(6) + ',0.0 \n' +
-            northEast.lng().toFixed(6) + ',' + southWest.lat().toFixed(6) + ',0.0 \n' +
-            southWest.lng().toFixed(6) + ',' + southWest.lat().toFixed(6) + ',0.0 \n';
+        kmltext += southWest.lng.toFixed(6) + ',' + southWest.lat.toFixed(6) + ',0.0 \n' +
+            southWest.lng.toFixed(6) + ',' + northEast.lat.toFixed(6) + ',0.0 \n' +
+            northEast.lng.toFixed(6) + ',' + northEast.lat.toFixed(6) + ',0.0 \n' +
+            northEast.lng.toFixed(6) + ',' + southWest.lat.toFixed(6) + ',0.0 \n' +
+            southWest.lng.toFixed(6) + ',' + southWest.lat.toFixed(6) + ',0.0 \n';
         kmltext += '</coordinates></LinearRing></outerBoundaryIs>\n</Polygon>\n</Placemark>\n';
         placemarks[plmcur].plmtext = kmlcode = kmltext;
         gob('eGaaSCoords').value = kmlheading() + kmltext + kmlend();
@@ -2388,9 +2366,7 @@ function logCode6() {
 function logCode7() { // javascript for circle
     if (notext === true) return;
     //placemarks[plmcur].style = circlestyles[ccur].name;
-    gob('eGaaSCoords').value = 'var circle = new google.maps.Circle({\n'
-        + 'map: map,\n'
-        + 'center: new google.maps.LatLng(' + centerPoint.lat().toFixed(6) + ',' + centerPoint.lng().toFixed(6) + '),\n'
+    gob('eGaaSCoords').value = 'var circle = new BMap.Circle(new BMap.Point(' + centerPoint.lng.toFixed(6) + ',' + centerPoint.lat.toFixed(6) + '), 0, {\n'
         + 'fillColor: ' + circlestyles[ccur].fill + ',\n'
         + 'fillOpacity: ' + circlestyles[ccur].fillopac + ',\n'
         + 'strokeColor: ' + circlestyles[ccur].color + ',\n'
@@ -2403,9 +2379,7 @@ function logCode7() { // javascript for circle
 function logCode8() { //javascript for Marker
     if (notext === true) return;
     var text = 'var image = \'' + markerstyles[mcur].icon + '\';\n'
-        + 'var marker = new google.maps.Marker({\n'
-        + 'position: ' + placemarks[plmcur].point + ',\n'
-        + 'map: map, //global variable \'map\' from opening function\n'
+        + 'var marker = new BMap.Marker(' + placemarks[plmcur].point + ', {\n'
         + 'icon: image\n'
         + '});\n'
         + '//Your content for the infowindow\n'
@@ -2474,21 +2448,19 @@ function regMap(coords, render) {
         }
 
         if (render != false) {
-            var map = new google.maps.Map(document.getElementById('map_canvas'), {
-                zoom: StateZoom,
-                center: { lat: StateCenterX, lng: StateCenterY },
-                mapTypeId: google.maps.MapTypeId.TERRAIN
+            var map = new BMap.Map('map_canvas', {
+                mapType: BMAP_NORMAL_MAP
             });
-
-            var State = new google.maps.Polygon({
-                paths: StateCoords,
+            map.enableScrollWheelZoom();
+            map.centerAndZoom(new BMap.Point(StateCenterY, StateCenterX), StateZoom);
+            var State = new BMap.Polygon(StateCoords, {
                 strokeColor: '#FF0000',
                 strokeOpacity: 0.8,
                 strokeWeight: 2,
                 fillColor: '#0000FF',
                 fillOpacity: 0.6
             });
-            State.setMap(map);
+            map.addOverlay(State);
         }
     } else {
         container.hide();
@@ -2505,37 +2477,35 @@ function openMap(container, address, area) {
 	newAddressContainer = address ? address : container + "_address";
 	newAreaContainer = area ? area : container + "_area";
 	
-    $("#dl_modal").load("content?controllerHTML=modal_map", {}, function () {
-        var modal = $("#modal_map");
-        updateLanguage("#dl_modal .lang");
+    var modal = $("#modal_map");
+    updateLanguage("#modal_map .lang");
 
-        if (!newCoordsContainer.val() == "") {
-            try {
-                regMap(newCoordsContainer.val(), false);
-            } catch (e) {
-                Alert(e.name, e.message, "error");
-                return false;
-            }
-
-            modal.modal("show");
-            modal.on('shown.bs.modal', function (e) {
-                initmap();
-                clearMap();
-                $("#toolchoice, #codechoice").change();
-            })
-        } else {
-            StateZoom = 7;
-            StateCenterX = 23.907173;
-            StateCenterY = 54.333531;
-
-            modal.modal("show");
-            modal.on('shown.bs.modal', function (e) {
-                initmap();
-                clearMap();
-                $("#toolchoice, #codechoice").change();
-            })
+    if (!newCoordsContainer.val() == "") {
+        try {
+            regMap(newCoordsContainer.val(), false);
+        } catch (e) {
+            Alert(e.name, e.message, "error");
+            return false;
         }
-    });
+
+        modal.modal("show");
+        modal.on('shown.bs.modal', function (e) {
+            initmap();
+            clearMap();
+            $("#toolchoice, #codechoice").change();
+        });
+    } else {
+        StateZoom = 7;
+        StateCenterX = 23.907173;
+        StateCenterY = 54.333531;
+
+        modal.modal("show");
+        modal.on('shown.bs.modal', function (e) {
+            initmap();
+            clearMap();
+            $("#toolchoice, #codechoice").change();
+        });
+    }
 }
 
 function saveMap() {
@@ -2562,8 +2532,6 @@ function saveMap() {
 	}, 0)
 }
 
-var miniMapNum = 0;
-
 function miniMap(elem, width, height) {
     $("." + elem).css({ "font-size": "0px" });
 
@@ -2575,10 +2543,7 @@ function miniMap(elem, width, height) {
         var miniCenterY = 0;
         var miniZoom = 0;
         var latlng = {};
-        var mapType = $(this).attr('maptype');
-        if (!mapType) {
-            mapType = 'terrain';
-        }
+        var mapType = getMapType($(this).attr('maptype'));
         var mapHeight = $(this).attr('hmap');
         if (mapHeight)
             mapHeight += 'px';
@@ -2589,7 +2554,7 @@ function miniMap(elem, width, height) {
                 $(this).addClass("panel");
             }
 
-            miniMapNum += 1;
+            ++miniMapNum;
             data = JSON.parse($(this).text());
             miniPoints = data.cords;
             miniZoom = Number(data.zoom);
@@ -2603,29 +2568,41 @@ function miniMap(elem, width, height) {
 
             $(this).text("");
             var canvas = document.createElement('div');
-            canvas.setAttribute("id", "miniMap_" + miniMapNum);
+            var id = 'miniMap_' + miniMapNum;
+            canvas.setAttribute('id', id);
             canvas.style.width = width;
             canvas.style.height = mapHeight;
             canvas.style.margin = "0px auto";
             this.appendChild(canvas);
 
-            var map = new google.maps.Map(document.getElementById("miniMap_" + miniMapNum), {
-                zoom: miniZoom,
-                center: { lat: miniCenterX, lng: miniCenterY },
-                mapTypeId: mapType
-            }); //google.maps.MapTypeId.TERRAIN
-
-            var mini = new google.maps.Polygon({
-                paths: miniCoords,
+            var map = new BMap.Map(id, {
+                mapType: mapType
+            });
+            map.enableScrollWheelZoom();
+            map.centerAndZoom(new BMap.Point(miniCenterY, miniCenterX), miniZoom);
+            var mini = new BMap.Polygon(miniCoords, {
                 strokeColor: '#FF0000',
                 strokeOpacity: 0.8,
                 strokeWeight: 2,
                 fillColor: '#0000FF',
                 fillOpacity: 0.6
             });
-            mini.setMap(map);
+            map.addOverlay(mini);
         }
     });
+}
+
+function getMapType(maptype) {
+    if (typeof maptype !== 'string') {
+        return BMAP_NORMAL_MAP;
+    }
+    switch (maptype.toLowerCase()) {
+        case 'roadmap': return BMAP_NORMAL_MAP;
+        case 'satellite': return BMAP_SATELLITE_MAP;
+        case 'hybrid': return BMAP_HYBRID_MAP;
+        case 'terrain': return BMAP_PERSPECTIVE_MAP;
+        default: return BMAP_NORMAL_MAP;
+    }
 }
 
 function userLocation(elem, width, height) {
@@ -2638,17 +2615,14 @@ function userLocation(elem, width, height) {
         var tag = $(this).context.tagName.toLowerCase();
         var data = $(this).text() ? $(this).text() : $(this).val();
         var zoom = 5;
-        var center = { lat: 23.907173, lng: 54.333531 };
+        var center = new BMap.Point(54.333531, 23.907173);
         var point = null;
         var options = {};
         var draggable = true;
         var canvas = document.createElement('div');
         var textarea;
         var id = "userLocation_" + num;
-        var mapType = $(this).attr('maptype');
-        if (!mapType) {
-            mapType = 'terrain';
-        }
+        var mapType = getMapType($(this).attr('maptype'));
         var mapHeight = $(this).attr('hmap');
         if (mapHeight)
             mapHeight += 'px';
@@ -2677,43 +2651,37 @@ function userLocation(elem, width, height) {
             container.appendChild(canvas);
         }
 
-        var map = new google.maps.Map(document.getElementById(id), {
-            zoom: zoom,
-            center: center,
-            mapTypeId: mapType
-        });
-
-        var marker = new google.maps.Marker({
-            position: point,
-            map: map,
+        options.mapType = mapType;
+        var map = new BMap.Map(id, options);
+        map.enableScrollWheelZoom();
+        map.centerAndZoom(center, zoom);
+        var marker = new BMap.Marker(point, {
             draggable: draggable
         });
 
-        map.setOptions(options);
-
         map.addListener('drag', function () {
             if (point != null && tag === "textarea") {
-                textarea.innerHTML = '{"center_point":["' + map.getCenter().lat() + '","' + map.getCenter().lng() + '"], "zoom":"' + map.getZoom() + '", "cords":["' + marker.getPosition().lat() + '","' + marker.getPosition().lng() + '"]}';
+                textarea.innerHTML = '{"center_point":["' + map.getCenter().lat + '","' + map.getCenter().lng + '"], "zoom":"' + map.getZoom() + '", "cords":["' + marker.getPosition().lat + '","' + marker.getPosition().lng + '"]}';
             }
         });
 
         map.addListener('zoom_changed', function () {
             if (point != null && tag === "textarea") {
-                textarea.innerHTML = '{"center_point":["' + map.getCenter().lat() + '","' + map.getCenter().lng() + '"], "zoom":"' + map.getZoom() + '", "cords":["' + marker.getPosition().lat() + '","' + marker.getPosition().lng() + '"]}';
+                textarea.innerHTML = '{"center_point":["' + map.getCenter().lat + '","' + map.getCenter().lng + '"], "zoom":"' + map.getZoom() + '", "cords":["' + marker.getPosition().lat + '","' + marker.getPosition().lng + '"]}';
             }
         });
 
         marker.addListener('drag', function () {
             if (point != null && tag === "textarea") {
-                textarea.innerHTML = '{"center_point":["' + map.getCenter().lat() + '","' + map.getCenter().lng() + '"], "zoom":"' + map.getZoom() + '", "cords":["' + marker.getPosition().lat() + '","' + marker.getPosition().lng() + '"]}';
+                textarea.innerHTML = '{"center_point":["' + map.getCenter().lat + '","' + map.getCenter().lng + '"], "zoom":"' + map.getZoom() + '", "cords":["' + marker.getPosition().lat + '","' + marker.getPosition().lng + '"]}';
             }
         });
 
         map.addListener('click', function (e) {
             if (tag === "textarea") {
-                point = e.latLng;
+                point = e.point;
                 marker.setPosition(point);
-                textarea.innerHTML = '{"center_point":["' + map.getCenter().lat() + '","' + map.getCenter().lng() + '"], "zoom":"' + map.getZoom() + '", "cords":["' + marker.getPosition().lat() + '","' + marker.getPosition().lng() + '"]}';
+                textarea.innerHTML = '{"center_point":["' + map.getCenter().lat + '","' + map.getCenter().lng + '"], "zoom":"' + map.getZoom() + '", "cords":["' + marker.getPosition().lat + '","' + marker.getPosition().lng + '"]}';
             }
         });
 
@@ -2727,7 +2695,7 @@ function userLocation(elem, width, height) {
 
             map.setZoom(zoom);
             map.setCenter(center);
-            marker.setMap(map);
+            map.addOverlay(marker);
         }
     });
 }
