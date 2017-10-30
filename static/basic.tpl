@@ -3073,7 +3073,7 @@ Legend(" ", "Owner")
 P(pclass,#owner_name#)
             Image(If(GetVar(owner_avatar),#owner_avatar#,"/static/img/avatar.svg"), Avatar, media-box-object img-circle img-thumbnail thumb96 center-block)
 If(#owner_id#!=#citizen#)
-BtnPage(LandObjectContract, Buy,"LandId:#LandId#,buyer_id:'#citizen#'")
+BtnPage(LandObjectContract, $buy$,"LandId:#LandId#,buyer_id:'#citizen#'")
 IfEnd:
 DivsEnd:
 
@@ -3113,6 +3113,11 @@ If(GetVar(contract_id))
     SetVar(buyer_id = GetOne(owner_new_id,#state_id#_land_ownership,lend_object_id=#LandId# and owner_id=0))
 Else:
     SetVar(contract_id = 0)
+	SetVar(buyer_id = 0)
+IfEnd:
+
+If(!GetVar(owner_id))
+    SetVar(owner_id = 0)
 IfEnd:
 
 ValueById(#state_id#_citizens, #owner_id#,"id,name,avatar","owner_id,owner_name,owner_avatar")
@@ -3377,7 +3382,7 @@ Divs:content-wrapper
                         Else:
                             Divs: pull-right
                                 BtnPage(members_list, LangJS(back), "", btn btn-default btn-pill-left ml4)
-                                BtnContract(members_Request_Accept,$accept$, Accept requests from #vMemberName#,"RequestId:Val(MemberID),PersonStatus:Val(MemberStatus),RequestName:Val(MemberName),DateExpiration:Val(DateExpiration),isDateExpiration:Val(isDateExpiration)",'btn btn-success btn-pill-right',template,members_list)
+                                BtnContract(members_Request_Accept,$accept$, 确认接受 #vMemberName# 的申请?,"RequestId:Val(MemberID),PersonStatus:Val(MemberStatus),RequestName:Val(MemberName),DateExpiration:Val(DateExpiration),isDateExpiration:Val(isDateExpiration)",'btn btn-success btn-pill-right',template,members_list)
                             DivsEnd:
                         IfEnd:
                     DivsEnd:
