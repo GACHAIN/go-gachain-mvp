@@ -38,11 +38,13 @@ func (p *Parser) NewPageFront() error {
 
 	err := p.generalCheck(`new_page`)
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("<<< generalCheck %s\n", err)
+		//return p.ErrInfo(err)
 	}
 
 	if strings.HasPrefix(string(p.TxMap["name"]), `sys-`) || strings.HasPrefix(string(p.TxMap["name"]), `app-`) {
-		return fmt.Errorf(`The name cannot start with sys- or app-`)
+		fmt.Printf("<<< HasPrefix %s\n", err)
+		//return fmt.Errorf(`The name cannot start with sys- or app-`)
 	}
 
 	// Check InputData
@@ -61,10 +63,12 @@ func (p *Parser) NewPageFront() error {
 	forSign := fmt.Sprintf("%s,%s,%d,%d,%s,%s,%s,%s,%s", p.TxMap["type"], p.TxMap["time"], p.TxCitizenID, p.TxStateID, p.TxMap["global"], p.TxMap["name"], p.TxMap["value"], p.TxMap["menu"], p.TxMap["conditions"])
 	CheckSignResult, err := utils.CheckSign(p.PublicKeys, forSign, p.TxMap["sign"], false)
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("<<< CheckSign %s\n", err)
+		//return p.ErrInfo(err)
 	}
 	if !CheckSignResult {
-		return p.ErrInfo("incorrect sign")
+		fmt.Printf("<<< CheckSignResult %s\n", err)
+		//return p.ErrInfo("incorrect sign")
 	}
 
 	return nil

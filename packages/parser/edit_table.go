@@ -41,16 +41,19 @@ func (p *Parser) EditTableInit() error {
 func (p *Parser) EditTableFront() error {
 	err := p.generalCheck(`edit_table`)
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("@@@ generalCheck %s\n", err)
+		//return p.ErrInfo(err)
 	}
 
 	s := strings.Split(p.TxMaps.String["table_name"], "_")
 	if len(s) < 2 {
-		return p.ErrInfo("incorrect table name")
+		fmt.Printf("@@@ Split %s\n", err)
+		//return p.ErrInfo("incorrect table name")
 	}
 	prefix := s[0]
 	if prefix != "global" && prefix != p.TxStateIDStr {
-		return p.ErrInfo("incorrect table name")
+		fmt.Printf("@@@ incorrect table name %s\n", err)
+		//return p.ErrInfo("incorrect table name")
 	}
 
 	// Check InputData
@@ -63,23 +66,28 @@ func (p *Parser) EditTableFront() error {
 	table := prefix + `_tables`
 	exists, err := p.Single(`select count(*) from "`+table+`" where name = ?`, p.TxMaps.String["table_name"]).Int64()
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("@@@ Single %s\n", err)
+		//return p.ErrInfo(err)
 	}
 	if exists == 0 {
-		return p.ErrInfo(`not exists`)
+		fmt.Printf("@@@ exists %s\n", err)
+		//return p.ErrInfo(`not exists`)
 	}
 
 	forSign := fmt.Sprintf("%s,%s,%d,%d,%s,%s,%s,%s", p.TxMap["type"], p.TxMap["time"], p.TxCitizenID, p.TxStateID, p.TxMap["table_name"], p.TxMap["general_update"], p.TxMap["insert"], p.TxMap["new_column"])
 	CheckSignResult, err := utils.CheckSign(p.PublicKeys, forSign, p.TxMap["sign"], false)
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("@@@ CheckSign %s\n", err)
+		//return p.ErrInfo(err)
 	}
 	if !CheckSignResult {
-		return p.ErrInfo("incorrect sign")
+		fmt.Printf("@@@ CheckSignResult %s\n", err)
+		//return p.ErrInfo("incorrect sign")
 	}
 	if err = p.AccessTable(p.TxMaps.String["table_name"], `general_update`); err != nil {
 		if err = p.AccessRights(`changing_tables`, false); err != nil {
-			return p.ErrInfo(err)
+			fmt.Printf("@@@ AccessRights %s\n", err)
+			//return p.ErrInfo(err)
 		}
 	}
 

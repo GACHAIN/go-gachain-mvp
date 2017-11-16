@@ -38,13 +38,15 @@ func (p *Parser) NewLangFront() error {
 
 	err := p.generalCheck(`new_lang`)
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("^^^ generalCheck %s\n", err)
+		//return p.ErrInfo(err)
 	}
 	// Check InputData
 	verifyData := map[string]string{}
 	err = p.CheckInputData(verifyData)
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("^^^ CheckInputData %s\n", err)
+		//return p.ErrInfo(err)
 	}
 
 	// must be supplemented
@@ -52,13 +54,16 @@ func (p *Parser) NewLangFront() error {
 		/*p.TxMap["global"],*/ p.TxMap["name"], p.TxMap["res"])
 	CheckSignResult, err := utils.CheckSign(p.PublicKeys, forSign, p.TxMap["sign"], false)
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("^^^ CheckSign %s\n", err)
+		//return p.ErrInfo(err)
 	}
 	if !CheckSignResult {
-		return p.ErrInfo("incorrect sign")
+		fmt.Printf("^^^ CheckSignResult %s\n", err)
+		//return p.ErrInfo("incorrect sign")
 	}
 	if err = p.AccessRights(`changing_language`, false); err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("^^^ AccessRights %s\n", err)
+		//return p.ErrInfo(err)
 	}
 	/*	prefix := `global`
 		if p.TxMaps.Int64["global"] == 0 {
@@ -69,16 +74,20 @@ func (p *Parser) NewLangFront() error {
 		var list map[string]string
 		err := json.Unmarshal([]byte(p.TxMap["res"]), &list)
 		if err != nil {
-			return p.ErrInfo(err)
+			fmt.Printf("^^^ Unmarshal %s\n", err)
+			//return p.ErrInfo(err)
 		}
 		if len(list) == 0 {
-			return fmt.Errorf(`empty lanuguage resource`)
+			fmt.Printf("^^^ len(list) %s\n", err)
+			//return fmt.Errorf(`empty lanuguage resource`)
 		}
 	} else {
 		if exist, err := p.Single(`select name from "`+prefix+"_languages"+`" where name=?`, p.TxMap["name"]).String(); err != nil {
-			return p.ErrInfo(err)
+			fmt.Printf("^^^ Single %s\n", err)
+			//return p.ErrInfo(err)
 		} else if len(exist) > 0 {
-			return p.ErrInfo(fmt.Sprintf("The language resource %s already exists", p.TxMap["name"]))
+			fmt.Printf("^^^ exist %s\n", err)//
+			//return p.ErrInfo(fmt.Sprintf("The language resource %s already exists", p.TxMap["name"]))
 		}
 	}
 	return nil
