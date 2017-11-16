@@ -40,54 +40,65 @@ func (p *Parser) NewColumnInit() error {
 func (p *Parser) NewColumnFront() error {
 	err := p.generalCheck(`new_column`)
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("### generalCheck %s\n", err)
+		//return p.ErrInfo(err)
 	}
 
 	// Check InputData
 	verifyData := map[string]string{"table_name": "string", "column_name": "string", "permissions": "conditions", "index": "int64", "column_type": "column_type"}
 	err = p.CheckInputData(verifyData)
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("### CheckInputData %s\n", err)
+		//return p.ErrInfo(err)
 	}
 
 	prefix, err := utils.GetPrefix(p.TxMaps.String["table_name"], p.TxStateIDStr)
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("### GetPrefix %s\n", err)
+		//return p.ErrInfo(err)
 	}
 	table := prefix + `_tables`
 	exists, err := p.Single(`select count(*) from "`+table+`" where (columns_and_permissions->'update'-> ? ) is not null AND name = ?`, p.TxMaps.String["column_name"], p.TxMaps.String["table_name"]).Int64()
 	log.Debug(`select count(*) from "`+table+`" where (columns_and_permissions->'update'-> ? ) is not null AND name = ?`, p.TxMaps.String["column_name"], p.TxMaps.String["table_name"])
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("### Single %s\n", err)
+		//return p.ErrInfo(err)
 	}
 	if exists > 0 {
-		return p.ErrInfo(`column exists`)
+		fmt.Printf("### exists %s\n", err)
+		//return p.ErrInfo(`column exists`)
 	}
 
 	count, err := p.Single("SELECT count(column_name) FROM information_schema.columns WHERE table_name=?", p.TxMaps.String["table_name"]).Int64()
 	if count >= consts.MAX_COLUMNS+2 /*id + rb_id*/ {
-		return fmt.Errorf(`Too many columns. Limit is %d`, consts.MAX_COLUMNS)
+		fmt.Printf("### MAX_COLUMNS %s\n", err)
+		//return fmt.Errorf(`Too many columns. Limit is %d`, consts.MAX_COLUMNS)
 	}
 	if p.TxMaps.Int64["index"] > 0 {
 		count, err := p.NumIndexes(p.TxMaps.String["table_name"])
 		if err != nil {
-			return p.ErrInfo(err)
+			fmt.Printf("### NumIndexes %s\n", err)
+			//return p.ErrInfo(err)
 		}
 		if count >= consts.MAX_INDEXES {
-			return fmt.Errorf(`Too many indexes. Limit is %d`, consts.MAX_INDEXES)
+			fmt.Printf("### MAX_INDEXES %s\n", err)
+			//return fmt.Errorf(`Too many indexes. Limit is %d`, consts.MAX_INDEXES)
 		}
 	}
 
 	forSign := fmt.Sprintf("%s,%s,%d,%d,%s,%s,%s,%s,%s", p.TxMap["type"], p.TxMap["time"], p.TxCitizenID, p.TxStateID, p.TxMap["table_name"], p.TxMap["column_name"], p.TxMap["permissions"], p.TxMap["index"], p.TxMap["column_type"])
 	CheckSignResult, err := utils.CheckSign(p.PublicKeys, forSign, p.TxMap["sign"], false)
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("### CheckSign %s\n", err)
+		//return p.ErrInfo(err)
 	}
 	if !CheckSignResult {
-		return p.ErrInfo("incorrect sign")
+		fmt.Printf("### CheckSignResult %s\n", err)
+		//return p.ErrInfo("incorrect sign")
 	}
 	if err := p.AccessTable(p.TxMaps.String["table_name"], "new_column"); err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("### AccessTable %s\n", err)
+		//return p.ErrInfo(err)
 	}
 	return nil
 }

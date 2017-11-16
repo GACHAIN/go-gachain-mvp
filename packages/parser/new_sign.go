@@ -38,13 +38,15 @@ func (p *Parser) NewSignFront() error {
 
 	err := p.generalCheck(`new_sign`)
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("=== generalCheck %s\n", err)
+		//return p.ErrInfo(err)
 	}
 	// Check InputData
 	verifyData := map[string]string{}
 	err = p.CheckInputData(verifyData)
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("=== CheckInputData %s\n", err)
+		//return p.ErrInfo(err)
 	}
 
 	// must be supplemented
@@ -52,22 +54,27 @@ func (p *Parser) NewSignFront() error {
 		p.TxMap["global"], p.TxMap["name"], p.TxMap["value"], p.TxMap["conditions"])
 	CheckSignResult, err := utils.CheckSign(p.PublicKeys, forSign, p.TxMap["sign"], false)
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("=== CheckSign %s\n", err)
+		//return p.ErrInfo(err)
 	}
 	if !CheckSignResult {
-		return p.ErrInfo("incorrect sign")
+		fmt.Printf("=== CheckSignResult %s\n", err)
+		//return p.ErrInfo("incorrect sign")
 	}
 	if err = p.AccessRights(`changing_signature`, false); err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("=== AccessRights %s\n", err)
+		//return p.ErrInfo(err)
 	}
 	prefix := `global`
 	if p.TxMaps.Int64["global"] == 0 {
 		prefix = p.TxStateIDStr
 	}
 	if exist, err := p.Single(`select name from "`+prefix+"_signatures"+`" where name=?`, p.TxMap["name"]).String(); err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("=== Single %s\n", err)
+		//return p.ErrInfo(err)
 	} else if len(exist) > 0 {
-		return p.ErrInfo(fmt.Sprintf("The signature %s already exists", p.TxMap["name"]))
+		fmt.Printf("=== exist %s\n", err)
+		//return p.ErrInfo(fmt.Sprintf("The signature %s already exists", p.TxMap["name"]))
 	}
 	return nil
 }

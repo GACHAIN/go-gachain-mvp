@@ -42,7 +42,8 @@ func (p *Parser) NewContractFront() error {
 
 	err := p.generalCheck(`new_contract`)
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("*** generalCheck %s\n", err)
+		//return p.ErrInfo(err)
 	}
 
 	// Check the system limits. You can not send more than X time a day this TX
@@ -55,24 +56,28 @@ func (p *Parser) NewContractFront() error {
 		p.TxMaps.String["name"] = name[:off]
 		address := lib.StringToAddress(name[off+1:])
 		if address == 0 {
-			return p.ErrInfo(fmt.Errorf(`wrong wallet %s`, name[off+1:]))
+			fmt.Printf("*** StringToAddress %s\n", err)
+			//return p.ErrInfo(fmt.Errorf(`wrong wallet %s`, name[off+1:]))
 		}
 		p.TxMaps.Int64["wallet_contract"] = address
 	}
 	verifyData := map[string]string{"global": "int64", "name": "string"}
 	err = p.CheckInputData(verifyData)
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("*** CheckInputData %s\n", err)
+		//return p.ErrInfo(err)
 	}
 
 	// must be supplemented
 	forSign := fmt.Sprintf("%s,%s,%d,%d,%s,%s,%s,%s", p.TxMap["type"], p.TxMap["time"], p.TxCitizenID, p.TxStateID, p.TxMap["global"], name, p.TxMap["value"], p.TxMap["conditions"])
 	CheckSignResult, err := utils.CheckSign(p.PublicKeys, forSign, p.TxMap["sign"], false)
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("*** CheckSign %s\n", err)
+		//return p.ErrInfo(err)
 	}
 	if !CheckSignResult {
-		return p.ErrInfo("incorrect sign")
+		fmt.Printf("*** CheckSignResult %s\n", err)
+		//return p.ErrInfo("incorrect sign")
 	}
 	prefix := `global`
 	if p.TxMaps.Int64["global"] == 0 {
@@ -80,14 +85,17 @@ func (p *Parser) NewContractFront() error {
 	}
 	if len(p.TxMap["conditions"]) > 0 {
 		if err := smart.CompileEval(string(p.TxMap["conditions"]), uint32(p.TxStateID)); err != nil {
-			return p.ErrInfo(err)
+			fmt.Printf("*** CompileEval %s\n", err)
+			//return p.ErrInfo(err)
 		}
 	}
 
 	if exist, err := p.Single(`select id from "`+prefix+"_smart_contracts"+`" where name=?`, p.TxMap["name"]).Int64(); err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("*** Single %s\n", err)
+		//return p.ErrInfo(err)
 	} else if exist > 0 {
-		return p.ErrInfo(fmt.Sprintf("The contract %s already exists", p.TxMap["name"]))
+		fmt.Printf("*** exists %s\n", err)
+		//return p.ErrInfo(fmt.Sprintf("The contract %s already exists", p.TxMap["name"]))
 	}
 	return nil
 }

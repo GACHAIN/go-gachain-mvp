@@ -39,46 +39,55 @@ func (p *Parser) ActivateContractInit() error {
 func (p *Parser) ActivateContractFront() error {
 	err := p.generalCheck(`activate_contract`)
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("+++ generalCheck %s\n", err)
+		//return p.ErrInfo(err)
 	}
 
 	forSign := fmt.Sprintf("%s,%s,%d,%d,%s,%s", p.TxMap["type"], p.TxMap["time"], p.TxCitizenID,
 		p.TxStateID, p.TxMap["global"], p.TxMap["id"])
 	CheckSignResult, err := utils.CheckSign(p.PublicKeys, forSign, p.TxMap["sign"], false)
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("+++ CheckSign %s\n", err)
+		//return p.ErrInfo(err)
 	}
 	if !CheckSignResult {
-		return p.ErrInfo("incorrect sign")
+		fmt.Printf("+++ CheckSignResult %s\n", err)
+		//return p.ErrInfo("incorrect sign")
 	}
 	prefix := `global`
 	if p.TxMaps.Int64["global"] == 0 {
 		prefix = p.TxStateIDStr
 	}
 	if len(p.TxMaps.String["id"]) == 0 {
-		return p.ErrInfo("incorrect contract id")
+		fmt.Printf("+++ incorrect contract id %s\n", err)
+		//return p.ErrInfo("incorrect contract id")
 	}
 	if p.TxMaps.String["id"][0] > '9' {
 		p.TxMaps.String["id"], err = p.Single(`SELECT id FROM "`+prefix+`_smart_contracts" WHERE name = ?`, p.TxMaps.String["id"]).String()
 		if len(p.TxMaps.String["id"]) == 0 {
-			return p.ErrInfo("incorrect contract name")
+			fmt.Printf("+++ Single1 %s\n", err)
+			//return p.ErrInfo("incorrect contract name")
 		}
 	}
 	active, err := p.Single(`SELECT active FROM "`+prefix+`_smart_contracts" WHERE id = ?`, p.TxMaps.String["id"]).String()
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("+++ Single2 %s\n", err)
+		//return p.ErrInfo(err)
 	}
 	if active == `1` {
-		return p.ErrInfo(fmt.Errorf(`The contract has been already activated`))
+		fmt.Printf("+++ active %s\n", err)
+		//return p.ErrInfo(fmt.Errorf(`The contract has been already activated`))
 	}
 	curCost := p.TxUsedCost
 	cost, err := p.getEGSPrice(`activate_cost`)
 	p.TxUsedCost = curCost
 	if err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("+++ getEGSPrice %s\n", err)
+		//return p.ErrInfo(err)
 	}
 	if err := p.checkSenderDLT(cost, decimal.New(0, 0)); err != nil {
-		return p.ErrInfo(err)
+		fmt.Printf("+++ checkSenderDLT %s\n", err)
+		//return p.ErrInfo(err)
 	}
 	p.TxMaps.String["activate_cost"] = cost.String()
 	return nil
