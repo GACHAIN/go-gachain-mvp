@@ -104,7 +104,7 @@ Lang = {
 	"account": "账户",
 	"members": "成员",
 	"view_all": "查看全部",
-	"change": "更改",
+	"change": "变更",
 	"not_limited": "无限期",
 	"member_id": "成员ID",
 	"edit_property": "编辑房产",
@@ -352,7 +352,12 @@ Lang = {
 	"flip_horizontal": "水平翻转",
 	"flip_vertical": "垂直翻转",
 	"please_choose_image": "请选择一张图片文件",
-    "please_crop_photo": "请剪裁照片！"
+    "please_crop_photo": "请剪裁照片！",
+/** ================================================= */
+   "voting": "投票/民调",
+   "roles": "职务身份"
+
+
 };
 
 updateLanguage('.lang');
