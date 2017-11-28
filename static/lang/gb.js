@@ -352,7 +352,13 @@ Lang = {
 	"flip_horizontal": "Flip Horizontal",
 	"flip_vertical": "Flip Vertical",
 	"please_choose_image": "Please, choose an image file",
-    "please_crop_photo": "Please, crop the photo!"
+    "please_crop_photo": "Please, crop the photo!",
+/** ================================================= */
+   "voting": "Voting",
+   "roles": "Roles",
+   "role_name": "Roles Name",
+   "icon": "Ico",
+   "header": "Header"
 };
 
 updateLanguage('.lang');
